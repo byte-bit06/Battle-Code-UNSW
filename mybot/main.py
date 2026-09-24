@@ -51,6 +51,7 @@ class Brain:
         self.first_turn = True
         self.debug = ""
         self.target = None
+        self.plan = None            # Instinct's escape route from last turn
 
     def maybe_split(self, ct, snap, safe) -> bool:
         """Split policy (engine-verified: a splitting parent does NOT move this turn,
@@ -82,26 +83,61 @@ class Brain:
         # A new process (every split child!) pays ~40M points compiling modules on
         # its first turn, so the first turn gets a much smaller search budget.
         budget = config.FIRST_TURN_BUDGET_S if self.first_turn else config.TIME_BUDGET_S
-        self.first_turn = False
+        was_first, self.first_turn = self.first_turn, False
         deadline = Deadline(budget)
         mem = self.mem
         snap = snapshot.build(ct, game, mem.geo, DIR_INDEX)
         mem.update(snap)
         if config.ENABLE_SONAR:
             self.comms.receive(ct.get_sonar_messages(), snap, mem)
-        safe = safety.get_safe_moves(snap, mem)
+        safe = safety.get_safe_moves(snap, mem)     # safety.py stays live
         self.target = None
+        instinct_action = None
+        instinct_state = None
+        instinct_ladder = None
+        inf = {}
+        # not on a process's first turn: that turn already spends ~78M points on
+        # imports, and a dragon that exceeds 100M dies even with a move on file
+        if config.USE_INSTINCT and not was_first:
+            try:
+                from instinct import ladder as instinct_ladder
+                from instinct import state as instinct_state_mod
+                instinct_state = instinct_state_mod.from_snapshot(snap, mem)
+                if instinct_ladder.danger(instinct_state):
+                    instinct_action, self.plan, inf = instinct_ladder.decide_budgeted(
+                        instinct_state, self.plan, ct.get_unit_count(), deadline.t0)
+                    self.debug = f"INSTINCT {inf.get('level')}"
+                else:
+                    self.plan = None        # nobody near: Forage keeps the turn
+            except Exception:
+                instinct_action = None      # never let defence cost us the turn
         if self.maybe_split(ct, snap, safe):
             self.debug = "SPLIT (no legal move)"
             return
         fallback = safety.emergency_move(snap, mem, safe)
         forage.LAST_DEBUG = ""
-        try:
-            action = forage.forage_turn(snap, mem, safe, deadline)
-        except forage.ForageTimeout:
-            action = [fallback]
-        except Exception:
-            action = [fallback]          # never crash, never output nothing
+        action = None
+        if instinct_action is not None and instinct_action[0] == "split":
+            if ct.can_split(instinct_action[1]):
+                ct.do_split(instinct_action[1])
+                self.debug = "INSTINCT split"
+                return
+            instinct_action = None
+        # Instinct has priority; Forage only gets the turn when Instinct is calm
+        # "calm" reuses the key L1 already produced (safe, and nobody can ram us);
+        # recomputing slack() here would cost another handful of BFS passes
+        key = inf.get("key") if instinct_action is not None else None
+        calm = bool(key) and key[0] and key[1] == 0
+        if calm or instinct_action is None:
+            try:
+                if time.perf_counter() - deadline.t0 < config.INSTINCT_HARD_S:
+                    action = forage.forage_turn(snap, mem, safe, deadline)
+            except forage.ForageTimeout:
+                action = None
+            except Exception:
+                action = None
+        if not action and instinct_action is not None:
+            action = instinct_action[1]
         if not action:
             action = [fallback]
         if len(action) == 1:

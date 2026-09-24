@@ -31,6 +31,71 @@ SPLIT_MIN_LENGTH = 8           # only dragons this long bud off a child
 SPLIT_CHILD_SIZE = 3           # child length (= spawn length); parent keeps the rest
 SPLIT_LAST_ROUND = 470         # stop splitting near the end (tiebreak = longest dragon)
 
+# ------------------------------------------------ Instinct_Engine (defence) --
+# See instinct_engine.md. Instinct has absolute priority; other engines run on slack.
+# Wiring: safety.py stays live. Instinct decides when it sees danger; in the
+# clear, Forage keeps the turn (instinct_engine.md: "other engines run on slack").
+# ON. MEASURED on the shipped path (tools/instinct_arena.py --ablate, 6 scenarios
+# x 2 id orders x 4 seeds, 2026-09-24), survived / 34:
+#                              chamber   open
+#   Instinct (this config)       34/34   22/34     zero deaths on chamber
+#   without the `options` term    6/34   14/34     the term the engine IS
+#   without ram (l0 + hint)      34/34   21/34     no effect: unproven, kept as free
+#   Instinct off (control)       17/34   21/34
+# BOARD-DEPENDENT, and worth saying plainly: Instinct doubles survival on maps
+# with kelp structure and is a wash on open ones (the open set never separated
+# any variant from the control - it is a weak discriminator, not a null result).
+# CPU: p50 34.2M, max 61.9M of the 100M limit; ~4M over not running it at all.
+USE_INSTINCT = True          # master flag for the wiring in main.py
+INSTINCT_PROFILE = False     # collect per-level timings (p50/p95) into ladder.TIMINGS
+# MEASURED on the judge (probe, 2026-09-23): a turn that exceeds 100M points is
+# killed as "no valid action" EVEN IF a valid action was already printed. So the
+# ladder must stop itself; there is no safety net in re-submitting.
+INSTINCT_L1_MAX_S = 0.020    # skip L1 if the turn has already used this much
+INSTINCT_L2_MAX_S = 0.030    # ditto L2 (it is the expensive one)
+INSTINCT_HARD_S = 0.060      # beyond this, stop everything and end the turn
+ENABLE_INSTINCT = True
+INSTINCT_MAX_SPRINT = 3       # Tier A: longest enemy sprint we plan against
+INSTINCT_DANGER_DIST = 12     # no enemy head this close -> skip Instinct entirely.
+                              # MEASURED: the fatal box is built 4-25 rounds (median 9)
+                              # before death, so a tight gate never sees the turn that
+                              # mattered (tools/instinct_walkback.py).
+INSTINCT_HORIZON = 3          # joint-envelope horizon H (4.2)
+INSTINCT_NODE_CAP = 80        # BFS nodes per call. MEASURED: a node costs 25-45k
+                              # points on the judge, so every BFS is ~3M. The whole
+                              # turn is 100M and Forage already spends ~30M.
+INSTINCT_OPEN_DIST = 5        # "the open board" starts this far from our head (4.3)
+INSTINCT_CORRIDOR_RADIUS = 10 # give up looking for a way out past this
+INSTINCT_L1_CORRIDOR = True   # corridor count as a STANDING cost at L1, not an
+                              # emergency gate: every death so far was a box built
+                              # on turns nothing flagged as dangerous
+INSTINCT_L1_CORRIDOR_RADIUS = 5   # cheap version: shorter search...
+INSTINCT_L1_NODE_CAP = 32         # ...fewer nodes...
+INSTINCT_L1_CORRIDOR_KMAX = 2     # ...and stop at 2. Most of the fatal gaps are
+                                  # 1->2 (tools/instinct_walkback.py), and a third
+                                  # min-cut pass costs a BFS on every open turn.
+INSTINCT_L1_HORIZON = 2           # the frontier this standing cost aims at
+INSTINCT_REGION_CAP = 48      # chamber / flood-fill cap
+INSTINCT_SPACE_CAP = 32       # per-candidate timed space: enough to spot a trap
+INSTINCT_SURVIVE_DEPTH = 6    # look-ahead when checking a grown body still has moves
+INSTINCT_DEFENSIVE_SPLIT = True   # 4.8: split to survive a chamber
+INSTINCT_ALLOW_SPRINT = False     # let the ladder consider 2-step sprints
+INSTINCT_L2 = True                # run the control-layer level of the ladder
+INSTINCT_RAISE = False            # tests/harness: re-raise what the ladder swallows.
+                                  # A broad `except` hid a TypeError in l1_shallow for
+                                  # two sweeps; every result was the L0 reflex alone.
+INSTINCT_ABLATE = ""              # tests: zero key terms ("corridor", "options",
+                                  # "ram"; comma-separate several)
+# The key is four terms after measurement (instinct_tests/MEASUREMENT.md):
+#   safe      hard filter
+#   ram       UNRESOLVED. Ambiguous on both boards (no-ram was the best open-board
+#             variant at 22/34), and its ablation is confounded because it also
+#             feeds l0_reflex and the acute gate. Kept because it is near-free -
+#             not because it is proven.
+#   corridor  the one term with support on BOTH boards (no-corridor is joint-worst:
+#             12/34 chamber, 15/34 open)
+#   options   legal moves left after the step; what the greedy control does well
+
 # ------------------------------------------------------------- rewards ----
 R_LIVE = 100.0               # pearl visible now (or remembered)
 R_PREDICTED = 80.0           # spawn predicted from a countdown
