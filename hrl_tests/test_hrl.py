@@ -56,7 +56,7 @@ def ours(s):
 def test_option_list_is_the_action_space():
     assert O.NAMES == ["FORAGE", "CAMP_CLUSTER", "SCAVENGE", "EXPLORE", "PORTAL_TRAVEL", "HUNT",
                        "SPLIT_AND_PINCER", "RAM_TRADE", "ESCAPE", "DEFENSIVE_SPLIT", "ECON_SPLIT",
-                       "STALL"]
+                       "STALL", "FEED_LONGEST", "FEED_NEAREST"]
     for o in O.make_options():
         assert hasattr(o, "can_start") and hasattr(o, "step") and hasattr(o, "should_stop")
 
@@ -65,7 +65,21 @@ def test_features_have_a_fixed_size():
     s = board(scenarios.s_forage)
     t = turn_for(s, ours(s))
     mask = [True] * O.N_OPTIONS
-    assert len(F.build(t, mask)) == F.size(O.N_OPTIONS)
+    feats = F.build(t, mask, O.IDX["HUNT"])
+    assert len(feats) == F.size(O.N_OPTIONS)
+    prev = feats[-O.N_OPTIONS:]                     # last turn's option, one-hot
+    assert prev[O.IDX["HUNT"]] == 1.0 and sum(prev) == 1.0
+
+
+def test_learned_manager_refuses_weights_of_another_layout():
+    class Old:                                      # e.g. the 12-option weights
+        MEAN = STD = [0.0] * 35
+        W1, B1, W2, B2 = [[0.0] * 35], [0.0], [[0.0]] * 12, [0.0] * 12
+    try:
+        M.LearnedManager(Old)
+        assert False, "accepted weights of the wrong shape"
+    except ValueError:
+        pass
 
 
 def test_scripted_manager_only_ranks_available_options():
@@ -129,21 +143,51 @@ def test_shield_allows_a_deliberate_trade_onto_an_enemy_head():
     assert t.facts().ram_dir is not None
     d = t.facts().ram_dir[0]
     assert d not in t.legal                         # safety.py calls it a body...
-    assert O.shield(t, ("move", [d])) == ("move", [d])   # ...the shield lets RAM through
+    assert O.shield(t, ("move", [d], "ram")) == ("move", [d])   # ...a tagged trade passes
+    assert O.shield(t, ("move", [d])) is None       # an untagged step there is refused
+    assert O.shield(t, ("move", [d], "feed")) is None   # and it's not a teammate
+
+
+def coiled_parent_and_child():
+    """The SPLIT_AND_PINCER board's length-12 coil, split in half: the child's
+    body lies right under the parent's head."""
+    s = board(scenarios.s_pincer)
+    parent = ours(s)
+    s.apply(parent, ("split", 6))
+    return s, parent
+
+
+def test_feed_steps_into_a_teammate_body_and_the_shield_allows_only_that():
+    s, parent = coiled_parent_and_child()
+    t = turn_for(s, parent)
+    f = t.facts()
+    assert f.feed_dir is not None and f.ally_bodies
+    for opt in (O.FeedLongest(), O.FeedNearest()):
+        assert opt.can_start(t)
+        opt.start(t)
+        act = opt.step(t)
+        assert act == ("move", [f.feed_dir[0]], "feed")
+        assert O.shield(t, act) == ("move", [f.feed_dir[0]])
+    assert O.shield(t, ("move", [f.feed_dir[0]])) is None      # untagged: refused
+    assert O.shield(t, ("move", [f.feed_dir[0]], "ram")) is None  # not an enemy head
 
 
 # ---------------------------------------------------- initiation sets --
-def test_initiation_sets_match_their_boards():
+def test_initiation_sets_are_feasibility_only():
+    """No timing or length rules: only 'is this move physically possible'."""
     s = board(scenarios.s_ram)
     enemy = next(d for d in s.dragons.values() if d.team == "B")
     s.apply(enemy, ("move", [3]))
     t = turn_for(s, ours(s))
-    assert O.RamTrade().can_start(t)                # we are 3, they are 12
-    assert not O.EconSplit().can_start(t)           # too short, enemy close
+    assert O.RamTrade().can_start(t)                # an enemy head is adjacent
+    assert O.Hunt().can_start(t)                    # an enemy is in view (it's 4x longer)
+    assert not O.EconSplit().can_start(t)           # length 3 can't bud a length-3 child
+    assert not O.FeedLongest().can_start(t)         # no teammate in view
     s = board(scenarios.s_econ)
     t = turn_for(s, ours(s))
-    assert O.EconSplit().can_start(t)               # long, alone
-    assert not O.RamTrade().can_start(t)
+    assert O.EconSplit().can_start(t)               # a legal split
+    assert O.Stall().can_start(t) and O.Escape().can_start(t)   # any round, any length
+    assert not O.RamTrade().can_start(t) and not O.Hunt().can_start(t)
     s = board(scenarios.s_scavenge)
     t = turn_for(s, ours(s))
     assert O.Scavenge().can_start(t)                # a corpse in view

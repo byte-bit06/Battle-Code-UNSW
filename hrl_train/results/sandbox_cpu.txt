@@ -1,4 +1,4 @@
-﻿Judge-sandbox CPU points (unswbc run --sandbox -v, maps/default_small.map, hrlbot as team A vs mybot).
+Judge-sandbox CPU points (unswbc run --sandbox -v, maps/default_small.map, hrlbot as team A vs mybot).
 Limit: 100M points per turn. Parsed with forage_tests/sandbox_points.py.
 
 hrlbot, scripted manager (before lazy manager imports):

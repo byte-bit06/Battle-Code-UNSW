@@ -1,17 +1,21 @@
-"""The option library: the abstract actions the HRL manager chooses between.
+"""The option library: the moves the HRL manager chooses between, every turn.
 
-Every option has the same three parts (the Options framework):
-    can_start(t)   initiation set: may the manager pick it this turn?
-    step(t)        internal policy: ("move", [dirs]) | ("split", k) | None
-    should_stop(t) termination: hand control back to the manager
+The manager (the AI) has full autonomy: it picks one option EVERY turn and the
+option only answers "what is my move this turn?". Options hold no opinion on
+WHEN they should be used - that is learned. Each has:
+    can_start(t)   feasibility only: is this move physically possible now?
+                   (e.g. RAM_TRADE needs an enemy head next to ours)
+    step(t)        this turn's action: ("move", [dirs]) | ("split", k) | None
+    start(t)       reset its memory (a hunt target, an escape plan) when the
+                   manager switches to it; picking it again keeps the memory
+    should_stop(t) its memory is stale (e.g. PORTAL_TRAVEL already jumped)
 
-step() returning None also ends the option (it had nothing useful to do).
-Nothing here is allowed to be the last word on safety: shield() in this file
-vetoes any action that is illegal or, under danger, fails Instinct's Tier A
-check. Directions are ints 0 N, 1 E, 2 S, 3 W throughout.
+step() returning None means it has nothing to do; the Brain falls back to the
+manager's next choice. shield() in this file vetoes anything illegal, and is
+the only hard-coded rule. Directions are ints 0 N, 1 E, 2 S, 3 W throughout.
 
 Most options wrap the engines that already exist (forage.py, instinct/*).
-HUNT, SPLIT_AND_PINCER, PORTAL_TRAVEL and STALL are new.
+HUNT, SPLIT_AND_PINCER, PORTAL_TRAVEL, STALL and the FEED options are new.
 """
 
 import time
@@ -30,7 +34,7 @@ class Turn:
     and at most once (a BFS costs ~3M points on the judge)."""
 
     __slots__ = ("ct", "snap", "mem", "safe", "legal", "deadline", "unit_count",
-                 "first", "_st", "_fctx", "_danger", "_facts", "_split_k")
+                 "first", "_st", "_fctx", "_danger", "_facts", "_split_k", "_rammable")
 
     def __init__(self, ct, snap, mem, deadline, first):
         self.ct = ct
@@ -47,6 +51,7 @@ class Turn:
         self._danger = None
         self._facts = None
         self._split_k = -1
+        self._rammable = None
 
     def st(self):
         """Instinct's board State (no search, just gathering)."""
@@ -71,13 +76,26 @@ class Turn:
         return self._danger
 
     def split_k(self):
-        """Instinct's defensive split size, or None (cached: it runs BFSes)."""
+        """The split size that saves both halves when we are boxed in (Instinct's
+        should_split), or None. Cached: it runs BFSes, so it is only asked when
+        we are down to two legal moves or fewer (a box always gets there first)."""
         if self._split_k == -1:
             self._split_k = None
-            if self.danger() and len(self.snap.body) >= self.snap.my_len >= 4:
+            if (not self.first and len(self.legal) <= 2
+                    and len(self.snap.body) >= self.snap.my_len >= 4):
                 from instinct import policy
                 self._split_k = policy.should_split(self.st(), unit_count=self.unit_count)
         return self._split_k
+
+    def rammable(self):
+        """Can an enemy head reach ours before our next turn (a mutual kill)?"""
+        if self._rammable is None:
+            f = self.facts()
+            self._rammable = False
+            if not self.first and f.nearest_enemy is not None and f.nearest_enemy[0] <= 6:
+                from instinct import tempo
+                self._rammable = tempo.ram_exposure(self.st()) > 0
+        return self._rammable
 
     def facts(self):
         if self._facts is None:
@@ -91,7 +109,7 @@ class Facts:
 
     __slots__ = ("pearls_near", "nearest_pearl", "cluster", "reports_near",
                  "predicted_soon", "camp_tile", "enemies", "nearest_enemy",
-                 "allies", "portal", "explored", "hunt_target", "ram_dir")
+                 "allies", "ally_bodies", "portal", "explored", "ram_dir", "feed_dir")
 
     def __init__(self, t):
         snap, mem = t.snap, t.mem
@@ -144,7 +162,14 @@ class Facts:
         self.enemies = [(man(h.pos, head), h) for h in snap.heads if not h.teammate]
         self.enemies.sort(key=lambda e: e[0])
         self.nearest_enemy = self.enemies[0] if self.enemies else None
-        self.allies = sum(1 for h in snap.heads if h.teammate)
+        self.allies = [(man(h.pos, head), h) for h in snap.heads if h.teammate]
+        self.allies.sort(key=lambda e: e[0])
+        # teammates' visible BODY segments (not heads): dragon id -> [tiles]
+        self.ally_bodies = {}
+        my_id = snap.my_id
+        for tile, (did, is_head, mate, _d) in occ.items():
+            if mate and did != my_id and not is_head:
+                self.ally_bodies.setdefault(did, []).append(tile)
 
         # nearest known portal edge (its far end may still be unknown: vision
         # never reaches through a portal, so most pairs are only learned by using them)
@@ -158,27 +183,19 @@ class Facts:
         seen = mem.block_seen
         self.explored = sum(1 for b in seen if b >= 0) / len(seen)
 
-        # HUNT target: the nearest enemy we clearly outsize
-        L = snap.my_len
-        self.hunt_target = None
-        if L >= config.HUNT_MIN_LEN:
-            for m, h in self.enemies:
-                if m > config.HUNT_RADIUS:
-                    break
-                known_len = h.pos in snap.release        # whole dragon in view
-                need = config.HUNT_MARGIN + (0 if known_len else 3)
-                if L >= h.visible_len + need:
-                    self.hunt_target = h
-                    break
-
-        # RAM: an enemy head we can step onto right now
+        # an enemy head we can step onto (RAM) / a teammate body we can step
+        # onto (FEED) right now
         self.ram_dir = None
+        self.feed_dir = None
         for d in (0, 1, 2, 3):
             n = geo.step(head, d)
             o = occ.get(n) if n >= 0 else None
-            if o is not None and o[1] and not o[2]:
+            if o is None:
+                continue
+            if o[1] and not o[2] and self.ram_dir is None:
                 self.ram_dir = (d, o[0])
-                break
+            elif not o[1] and o[2] and o[0] != my_id and self.feed_dir is None:
+                self.feed_dir = (d, o[0])
 
 
 # ================================================================ options ==
@@ -243,9 +260,6 @@ class CampCluster(Option):
                 best, best_key = d, key
         return ("move", [best]) if best is not None else None
 
-    def should_stop(self, t):
-        return t.facts().predicted_soon == 0
-
 
 class Scavenge(Option):
     """Race to a pile of pearls (a death drop or a cluster), including piles
@@ -273,10 +287,6 @@ class Scavenge(Option):
                 return ("move", [d])
         return None
 
-    def should_stop(self, t):
-        f = t.facts()
-        return f.cluster == 0 and f.reports_near == 0
-
 
 class Explore(Option):
     """Go where we have not looked recently. Always available."""
@@ -284,10 +294,6 @@ class Explore(Option):
 
     def step(self, t):
         return ("move", [forage.explore(t.fctx(), use_goal=config.ENABLE_EXPLORE_GOAL)])
-
-    def should_stop(self, t):
-        f = t.facts()           # something to eat in sight: let the manager look again
-        return f.pearls_near > 0 or f.predicted_soon > 0
 
 
 class PortalTravel(Option):
@@ -361,12 +367,12 @@ class PortalTravel(Option):
 
 
 class Hunt(Option):
-    """Cut off a smaller enemy. Kills in this game come from an enemy head
-    running into a body, so the hunter lays its body ACROSS the enemy's path:
-    it heads for the tile HUNT_AHEAD steps in front of the enemy head, shrinks
-    the enemy's reachable room, keeps its own room, and never steps where any
-    enemy head could ram it. If the target slips out of view it follows the
-    last sighting for HUNT_MEMORY turns."""
+    """Go after the nearest visible enemy. Kills in this game come from an enemy
+    head running into a body, so the hunter lays its body across the enemy's
+    path: it closes on the tile HUNT_AHEAD steps in front of the enemy head,
+    shrinks the enemy's reachable room, keeps its own room, and never steps
+    where any enemy head could ram it. If the target slips out of view it
+    follows the last sighting for HUNT_MEMORY turns."""
     name = "HUNT"
 
     def __init__(self):
@@ -374,11 +380,11 @@ class Hunt(Option):
         self.last = None           # (tile ahead of the target, round seen)
 
     def can_start(self, t):
-        return not t.first and t.facts().hunt_target is not None
+        return not t.first and t.facts().nearest_enemy is not None
 
     def start(self, t):
-        h = t.facts().hunt_target
-        self.target = h.id if h is not None else None
+        ne = t.facts().nearest_enemy
+        self.target = ne[1].id if ne is not None else None
         self.last = None
 
     def _enemy(self, st):
@@ -439,69 +445,48 @@ class Hunt(Option):
 
 
 class SplitAndPincer(Option):
-    """Split so the child starts behind an enemy near our tail: two heads on
-    it instead of one. The child is a new program; its manager decides alone."""
+    """Split in half with an enemy in view: two heads on it instead of one.
+    The child leaves head-first from our tail and is a new program whose own
+    manager decides what it does next."""
     name = "SPLIT_AND_PINCER"
     one_shot = True
 
     def can_start(self, t):
-        f = t.facts()
-        snap = t.snap
-        h = f.hunt_target
-        if t.first or h is None or snap.my_len < config.PINCER_MIN_LEN or t.unit_count >= 64:
-            return False
-        # the enemy is alongside our REAR half (of what we can see): the child,
-        # which leaves head-first from our tail, starts on its side of us
-        man = t.mem.geo.manhattan
-        body = snap.body
-        rear = body[len(body) // 2:]
-        return bool(rear) and min(man(s, h.pos) for s in rear) <= config.PINCER_TAIL_RADIUS \
-            and min(man(s, h.pos) for s in rear) < man(snap.head, h.pos)
+        return (not t.first and t.facts().nearest_enemy is not None
+                and t.ct.can_split(t.snap.my_len // 2))
 
     def step(self, t):
-        from instinct import tempo
         k = t.snap.my_len // 2
-        if not t.ct.can_split(k) or tempo.ram_exposure(t.st()) > 0:
-            return None             # a splitting parent stands still: must be unrammable
-        return ("split", k)
+        return ("split", k) if t.ct.can_split(k) else None
 
 
 class RamTrade(Option):
-    """Deliberate head-to-head: both die. Only when the trade is worth it."""
+    """Head-to-head with an adjacent enemy head: both dragons die."""
     name = "RAM_TRADE"
     one_shot = True
 
     def can_start(self, t):
-        f = t.facts()
-        if t.first or f.ram_dir is None:
-            return False
-        from instinct import policy
-        st = t.st()
-        for e in st.enemies:
-            if e.id == f.ram_dir[1]:
-                return policy.may_trade(st, e)
-        return False
+        return not t.first and t.facts().ram_dir is not None
 
     def step(self, t):
         rd = t.facts().ram_dir
-        return ("move", [rd[0]]) if rd is not None else None
+        return ("move", [rd[0]], "ram") if rd is not None else None
 
 
 class Escape(Option):
-    """Instinct's reflex ladder: break out of a closing net. Exactly the
-    pre-HRL bot's danger mode: when the ladder's own key says we are calm (safe
-    and nobody can ram us), the Forage engine keeps the turn."""
+    """Instinct's reflex ladder: the safest move against every enemy head in
+    view. When the ladder's own key says we are calm (safe and nobody can ram
+    us), the Forage engine keeps the turn, as in the pre-HRL bot."""
     name = "ESCAPE"
 
     def __init__(self):
         self.plan = None
-        self.calm = 0
 
     def can_start(self, t):
-        return t.danger()
+        return not t.first
 
     def start(self, t):
-        self.calm = 0
+        self.plan = None
 
     def step(self, t):
         from instinct import ladder
@@ -521,13 +506,9 @@ class Escape(Option):
                     pass
         return action
 
-    def should_stop(self, t):
-        self.calm = 0 if t.danger() else self.calm + 1
-        return self.calm >= 2
-
 
 class DefensiveSplit(Option):
-    """Boxed in but unrammable this round: split so one half survives."""
+    """Boxed in: split at the size Instinct says leaves room for both halves."""
     name = "DEFENSIVE_SPLIT"
     one_shot = True
 
@@ -540,35 +521,24 @@ class DefensiveSplit(Option):
 
 
 class EconSplit(Option):
-    """Long, safe and alone: bud off a child to farm a second area."""
+    """Bud off a small child (ECON_CHILD long) to farm a second area."""
     name = "ECON_SPLIT"
     one_shot = True
 
     def can_start(self, t):
-        snap = t.snap
-        f = t.facts()
-        if snap.my_len < config.ECON_MIN_LEN or snap.round >= config.ECON_LAST_ROUND:
-            return False
-        if t.unit_count >= config.ECON_MAX_UNITS:
-            return False
-        if f.nearest_enemy is not None and f.nearest_enemy[0] <= config.ECON_CLEAR_RADIUS:
-            return False
-        return t.ct.can_split(config.ECON_CHILD)
+        return not t.first and t.ct.can_split(config.ECON_CHILD)
 
     def step(self, t):
         return ("split", config.ECON_CHILD) if t.ct.can_split(config.ECON_CHILD) else None
 
 
 class Stall(Option):
-    """Protect the longest dragon: coil in safe space, keep options open, stay
-    away from enemy heads, eat only what is free (tiebreak = longest dragon)."""
+    """Play for time: coil in safe space, keep moves open, stay away from enemy
+    heads, eat only what is free (the round-500 tiebreak is the longest dragon)."""
     name = "STALL"
 
     def can_start(self, t):
-        snap = t.snap
-        if t.first or snap.my_len < config.STALL_MIN_LEN:
-            return False
-        return snap.round >= config.STALL_ROUND or t.mem.is_longest(snap)
+        return not t.first
 
     def step(self, t):
         from instinct import policy, space, tempo
@@ -593,11 +563,73 @@ class Stall(Option):
         return ("move", [best]) if best is not None else None
 
 
+class Feed(Option):
+    """Sacrifice this dragon to a teammate: run into its BODY (never its head,
+    which would kill both). We die and drop ceil(L/2) pearls on every second
+    segment of our body, right beside the teammate, which the teammate can
+    then eat - e.g. to make one dragon the longest for the round-500 tiebreak.
+    Two variants so the AI also chooses WHO gets fed."""
+    name = "FEED"
+    pick = None                     # "longest" | "nearest"
+
+    def __init__(self):
+        self.target = None
+
+    def can_start(self, t):
+        return not t.first and bool(t.facts().ally_bodies)
+
+    def _choose(self, t):
+        f = t.facts()
+        geo, head = t.mem.geo, t.snap.head
+        if self.pick == "longest":
+            size = {h.id: h.visible_len for _m, h in f.allies}
+            return max(f.ally_bodies, key=lambda i: (size.get(i, 0), len(f.ally_bodies[i])))
+        return min(f.ally_bodies, key=lambda i: min(geo.manhattan(s, head) for s in f.ally_bodies[i]))
+
+    def start(self, t):
+        self.target = None
+
+    def step(self, t):
+        f = t.facts()
+        if self.target not in f.ally_bodies:
+            if not f.ally_bodies:
+                return None
+            self.target = self._choose(t)
+        geo, head = t.mem.geo, t.snap.head
+        segs = set(f.ally_bodies[self.target])
+        for d in (0, 1, 2, 3):                      # next to its body: go in
+            if geo.step(head, d) in segs:
+                return ("move", [d], "feed")
+        c = t.fctx()                                # otherwise walk up beside it
+        best, best_d = None, None
+        for s in segs:
+            for n in geo.neighbours(s):
+                if n >= 0 and n in c.dist and (best is None or c.dist[n] < best_d):
+                    best, best_d = n, c.dist[n]
+        if best is None:
+            return None
+        path = routing.path_to(c.parent, head, best)
+        if not path or path[0] not in t.safe:
+            return None
+        return ("move", [path[0]])
+
+
+class FeedLongest(Feed):
+    name = "FEED_LONGEST"
+    pick = "longest"
+
+
+class FeedNearest(Feed):
+    name = "FEED_NEAREST"
+    pick = "nearest"
+
+
 def make_options():
     """Fresh option instances for one dragon (options hold per-dragon state).
     The ORDER is the manager's action space: never reorder without retraining."""
     return [Forage(), CampCluster(), Scavenge(), Explore(), PortalTravel(), Hunt(),
-            SplitAndPincer(), RamTrade(), Escape(), DefensiveSplit(), EconSplit(), Stall()]
+            SplitAndPincer(), RamTrade(), Escape(), DefensiveSplit(), EconSplit(), Stall(),
+            FeedLongest(), FeedNearest()]
 
 
 NAMES = [o.name for o in make_options()]
@@ -607,18 +639,22 @@ IDX = {n: i for i, n in enumerate(NAMES)}
 
 # ================================================================= shield ==
 def shield(t, action):
-    """Return `action` if it is safe to send, otherwise a replacement or None.
+    """Return `action` if it may be sent, otherwise a replacement or None.
 
-    Never learned, never switched off:
+    The only hard-coded rules in the bot. Never learned, never switched off:
       * a split must be legal (an illegal split kills the parent);
-      * a move's first step must not be certain death (kelp, a body, our tail);
+      * a move's first step must not be certain death (kelp, a body, our tail),
+        EXCEPT the two deliberate deaths the AI can choose: a "ram" step onto an
+        enemy head (RAM_TRADE) and a "feed" step onto a teammate's body (FEED);
       * a sprint must be affordable and collision-free all the way;
       * under danger, a single step that fails Instinct's Tier A check (no
         legal follow-up even if no body ever moves) is swapped for the reflex.
+    Returns ("move", dirs) or ("split", k): the tag is dropped.
     """
     if action is None:
         return None
-    kind, arg = action
+    kind, arg = action[0], action[1]
+    tag = action[2] if len(action) > 2 else None
     if kind == "split":
         return action if t.ct.can_split(arg) else None
     dirs = list(arg)
@@ -626,12 +662,13 @@ def shield(t, action):
     if not dirs:
         return None
     if dirs[0] not in t.legal:
-        # the one deliberate exception: a single step onto an ENEMY head is a
-        # trade (both die), which RAM_TRADE only proposes when policy.may_trade
         n = t.mem.geo.step(snap.head, dirs[0])
         o = snap.occ.get(n) if n >= 0 else None
-        if len(dirs) == 1 and o is not None and o[1] and not o[2]:
-            return ("move", dirs)
+        if len(dirs) == 1 and o is not None and o[0] != snap.my_id:
+            if tag == "ram" and o[1] and not o[2]:
+                return ("move", dirs)
+            if tag == "feed" and not o[1] and o[2]:
+                return ("move", dirs)
         return None
     if len(dirs) > 1:
         if snap.my_len - (len(dirs) - 1) < 2:

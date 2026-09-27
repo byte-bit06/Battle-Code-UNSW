@@ -106,12 +106,12 @@ class restored:
 class DragonLog:
     """Per-dragon bookkeeping for rewards."""
     __slots__ = ("id", "team", "decisions", "kills", "death_round", "death_len",
-                 "death_cause", "split_credit", "born")
+                 "death_cause", "split_credit", "hist")
 
-    def __init__(self, did, team, born):
+    def __init__(self, did, team):
         self.id = did
         self.team = team
-        self.born = born
+        self.hist = {}             # round -> length at the end of that round
         self.decisions = []        # dicts from Brain.recorder
         self.kills = []            # (round, enemy length)
         self.death_round = None
@@ -152,7 +152,7 @@ def _play_game(map_path, seed, a, b, max_rounds=500, record=(), on_brain=None,
 
     def attach(d):
         spec = specs[d.team]
-        logs[d.id] = log = DragonLog(d.id, d.team, s.round)
+        logs[d.id] = log = DragonLog(d.id, d.team)
         if isinstance(spec, Scripted):
             brains[d.id] = spec.make(s, d)
             return
@@ -197,6 +197,9 @@ def _play_game(map_path, seed, a, b, max_rounds=500, record=(), on_brain=None,
                 lg.death_round, lg.death_len = s.round, lengths[i]
                 lg.death_cause = s.dragons[i].death_cause
             _credit_kills(s, d, dead, lengths, logs)
+        for i, x in s.dragons.items():
+            if x.alive:
+                logs[i].hist[s.round] = x.length
         s.end_round()
         if stop is not None and not s.over and stop(s):
             return {"winner": None, "result": "stopped", "rounds": s.round, "logs": logs,

@@ -1,4 +1,4 @@
-﻿option              forced: success    mean  picks   scripted: success    mean
+option              forced: success    mean  picks   scripted: success    mean
 FORAGE                     7/8         7.25    9.0            7/8         7.25
 CAMP_CLUSTER               8/8        10.62    7.5            8/8        14.62
 SCAVENGE                   8/8         6.00    1.0            8/8         6.00

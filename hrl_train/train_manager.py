@@ -1,26 +1,31 @@
-"""Phase 5: train the manager (which option to run) on frozen options.
+"""Phase 5: train the manager - the AI that picks an option EVERY turn.
 
     python hrl_train/train_manager.py --iters 30
 
 Pipeline
   1. demonstrations  games with the scripted manager (plus some random-option
-                     games for coverage), recorded per decision
+                     games for coverage), recorded every turn
   2. pretrain        behaviour cloning, DQfD-style: TD loss on every transition
                      plus a large-margin loss that makes the scripted choice the
                      argmax, so the net starts as the baseline with meaningful Q
-  3. self-play RL    Double DQN over OPTIONS (an SMDP): a decision's reward is
-                     everything that happened until the next decision and the
-                     bootstrap is discounted by gamma ** (turns the option ran).
+  3. self-play RL    Double DQN over options. The margin loss fades out, so
+                     from then on only the reward decides: when to split, when
+                     to hunt, when to feed which teammate, and so on.
                      Opponents: mybot, the scripted HRL bot, and past snapshots.
                      Maps, seeds and team side are random every game.
   4. export          the best snapshot (by evaluation vs mybot) becomes
-                     hrlbot/manager_weights.py, plain lists for the judge.
+                     manager_weights.py, plain lists for the judge.
 
-Reward per decision (one dragon, from this decision to the next):
-    length gained  + length handed to split children (splits are not a loss)
+Reward for one dragon's decision (this turn to the next):
+    length gained
+  + length handed to a split child, plus CHILD_W x what the child then grew
   + KILL_R + 0.25 * victim length for each enemy that died on us
   - DEATH_R - 0.5 * our length if we died
-  +/- WIN_R at the end of the game for dragons still alive
+  + if we died feeding a teammate: FEED_W x what that teammate then grew, up to
+    the ceil(L/2) pearls we dropped
+  + the team's final result (+/- WIN_R, 0 draw), for EVERY dragon of the team,
+    discounted by gamma ** (rounds between the dragon's end and the game's end):
+    a late sacrifice that wins the longest-dragon tiebreak gets the credit.
 """
 import argparse
 import glob
@@ -40,9 +45,10 @@ sys.path.insert(0, HERE)
 
 GAMMA = 0.98
 KILL_R, DEATH_R, WIN_R = 3.0, 5.0, 10.0
+FEED_W = 1.0
 # credit a split with its child's lifetime growth (--child-credit); read from the
 # environment so the spawned rollout workers see the value the main process set
-CHILD_W = float(os.environ.get("HRL_CHILD_W", "0"))
+CHILD_W = float(os.environ.get("HRL_CHILD_W", "1.0"))
 HIDDEN = 32
 MARGIN = 0.8
 
@@ -59,6 +65,25 @@ def child_gain(r, cid, k):
         return 0.0
     end_len = lg.death_len if lg.death_round is not None else r["sim"].dragons[cid].length
     return max(0.0, end_len - k)
+
+
+def feed_gain(r, lg):
+    """If this dragon died running into a TEAMMATE's body: how much that
+    teammate grew over the next L + 10 rounds, capped at the ceil(L/2) pearls
+    we dropped (it may also have eaten other pearls). Otherwise 0."""
+    cause = lg.death_cause
+    if not cause.startswith("hit dragon "):
+        return 0.0
+    mate = r["logs"].get(int(cause.split()[-1]))
+    if mate is None or mate.team != lg.team or not mate.hist:
+        return 0.0
+    r0 = lg.death_round
+    later = [rd for rd in mate.hist if rd <= r0 + lg.death_len + 10]
+    before = [rd for rd in mate.hist if rd < r0]
+    if not later or not before:
+        return 0.0
+    grew = mate.hist[max(later)] - mate.hist[max(before)]
+    return float(max(0, min(grew, (lg.death_len + 1) // 2)))
 
 
 def transitions(r, side):
@@ -81,10 +106,10 @@ def transitions(r, side):
                 done, s2, m2 = True, d["feats"], d["mask"]
                 if lg.death_round is not None:
                     end, L1 = lg.death_round + 1, lg.death_len
-                    extra = -(DEATH_R + 0.5 * lg.death_len)
+                    extra = -(DEATH_R + 0.5 * lg.death_len) + FEED_W * feed_gain(r, lg)
                 else:
                     end, L1 = r["rounds"], sim.dragons[lg.id].length
-                    extra = WIN_R * win
+                extra += WIN_R * win * GAMMA ** max(0, r["rounds"] - end)
             rew = (L1 - L0) + extra
             for rd, k, *child in lg.split_credit:
                 if start <= rd < end:
@@ -136,7 +161,9 @@ def rollout(job):
     return tr, outcome, os.path.basename(job["map"])[:-4]
 
 
-def collect(pool, n_games, weights, epsilon, rng, opponents, past=(), demo=False):
+def collect(pool, n_games, weights, epsilon, rng, opponents, past=(), demo=False, keep=1.0):
+    """Play n_games; keep a random `keep` fraction of each game's transitions
+    (a decision every turn makes ~10k per game, most of them near-duplicates)."""
     maps = sorted(glob.glob(os.path.join(ROOT, "maps", "*.map")))
     jobs = []
     for _ in range(n_games):
@@ -154,6 +181,9 @@ def collect(pool, n_games, weights, epsilon, rng, opponents, past=(), demo=False
     for tr, outcome, _m in pool.map(rollout, jobs):
         outcomes.append(outcome)
         if tr is not None:
+            if keep < 1.0:
+                sel = np.flatnonzero(np.random.random(len(tr["a"])) < keep)
+                tr = {k: v[sel] for k, v in tr.items()}
             tr["demo"] = np.full(len(tr["a"]), demo, bool)
             out.append(tr)
     return out, outcomes
@@ -265,10 +295,12 @@ def main():
     ap.add_argument("--pretrain-steps", type=int, default=4000)
     ap.add_argument("--eval-every", type=int, default=5)
     ap.add_argument("--eval-games", type=int, default=32)
-    ap.add_argument("--buffer", type=int, default=400_000)
+    ap.add_argument("--buffer", type=int, default=600_000)
+    ap.add_argument("--keep", type=float, default=0.35,
+                    help="fraction of each game's per-turn transitions kept")
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 4) - 2))
     ap.add_argument("--out", default=os.path.join(HERE, "runs", time.strftime("%Y%m%d-%H%M")))
-    ap.add_argument("--child-credit", type=float, default=0.0,
+    ap.add_argument("--child-credit", type=float, default=1.0,
                     help="reward a split with this x its child's lifetime growth")
     args = ap.parse_args()
     global CHILD_W
@@ -286,8 +318,10 @@ def main():
     log(f"=== train_manager {time.strftime('%Y-%m-%d %H:%M')} {vars(args)}")
     with ProcessPoolExecutor(max_workers=args.workers) as pool:
         t0 = time.time()
-        demo, outs = collect(pool, args.demo_games, None, 0.0, rng, ["mybot", "hrl"], demo=True)
-        cover, outs2 = collect(pool, args.demo_games // 3, None, 0.3, rng, ["mybot", "hrl"])
+        demo, outs = collect(pool, args.demo_games, None, 0.0, rng, ["mybot", "hrl"], demo=True,
+                             keep=args.keep)
+        cover, outs2 = collect(pool, args.demo_games // 3, None, 0.3, rng, ["mybot", "hrl"],
+                               keep=args.keep)
         buf = merge(demo + cover)
         log(f"demonstrations: {len(buf['a'])} decisions from {len(outs) + len(outs2)} games "
             f"({time.time() - t0:.0f}s); scripted win rate in them "
@@ -308,11 +342,12 @@ def main():
             eps = max(0.05, 0.3 * (1 - it / (0.7 * args.iters)))
             t1 = time.time()
             chunks, outs = collect(pool, args.games, w, eps, rng, ["mybot", "mybot", "hrl", "past"],
-                                   past=past)
+                                   past=past, keep=args.keep)
             buf = merge([buf] + chunks)
             if len(buf["a"]) > args.buffer:          # keep demos, drop the oldest self-play
-                keep = np.concatenate([np.flatnonzero(buf["demo"]),
-                                       np.flatnonzero(~buf["demo"])[-(args.buffer // 2):]])
+                demos = np.flatnonzero(buf["demo"])
+                room = max(args.buffer - len(demos), args.buffer // 2)
+                keep = np.concatenate([demos, np.flatnonzero(~buf["demo"])[-room:]])
                 buf = {k: v[keep] for k, v in buf.items()}
             margin_w = max(0.05, 1.0 * (1 - it / (0.5 * args.iters)))
             loss = L.train(buf, args.steps, margin_w=margin_w)

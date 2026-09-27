@@ -31,11 +31,10 @@ sys.path.insert(0, HERE)
 
 # name -> (kind, low, high); kind "f" float, "i" int
 SPACES = {
+    # only HOW an option plays is tuned here; WHEN to use it is the manager's job
     "HUNT": {"HUNT_W_SQUEEZE": ("f", 0, 3), "HUNT_W_OWN": ("f", 0, 2),
-             "HUNT_W_CLOSE": ("f", 0, 3), "HUNT_AHEAD": ("i", 0, 4), "HUNT_MARGIN": ("i", 1, 5)},
-    "SPLIT_AND_PINCER": {"PINCER_MIN_LEN": ("i", 6, 16), "PINCER_TAIL_RADIUS": ("i", 2, 6)},
-    "ECON_SPLIT": {"ECON_MIN_LEN": ("i", 6, 16), "ECON_CHILD": ("i", 2, 6),
-                   "ECON_MAX_UNITS": ("i", 4, 24)},
+             "HUNT_W_CLOSE": ("f", 0, 3), "HUNT_AHEAD": ("i", 0, 4)},
+    "ECON_SPLIT": {"ECON_CHILD": ("i", 2, 6)},
     "CAMP_CLUSTER": {"CAMP_WINDOW": ("i", 4, 16), "CAMP_RADIUS": ("i", 4, 10)},
 }
 

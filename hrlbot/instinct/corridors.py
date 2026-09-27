@@ -1,4 +1,4 @@
-﻿"""Escape connectivity: the corridor count (4.3).
+"""Escape connectivity: the corridor count (4.3).
 
 Volume is a lagging signal; connectivity is a leading one. Three dragons
 closing in show up here several turns before flood-fill volume notices.

@@ -1,4 +1,4 @@
-﻿"""Every tunable constant for the bot lives here. No magic numbers elsewhere.
+"""Every tunable constant for the bot lives here. No magic numbers elsewhere.
 
 IMPORTANT - how time works on the judge:
 The judge runs Python inside a metered WebAssembly sandbox. Each turn gets
@@ -150,13 +150,13 @@ BEAM_EXPANSION_CAP_BIG = 24
 HOLD_MAX_BIG = 8
 
 # ================================================================= HRL ====
-# Hierarchical RL (HRL_CHECKLIST.md). A manager picks an option (abstract
-# action); the option plays moves until it stops; a safety shield vetoes any
-# move that dies. Option parameters marked (tuned) were set by
-# hrl_train/tune_options.py; everything else is a design choice.
+# Hierarchical RL (HRL_CHECKLIST.md). Every turn the AI (the manager) picks an
+# option and the option gives that turn's move; a safety shield vetoes anything
+# illegal. The options carry no rules about WHEN to use them - those were
+# removed so the AI decides (round, length, which teammate to feed, ...).
+# Values marked (tuned) are how an option plays, set by hrl_train/tune_options.py.
 HRL_MANAGER = "learned"      # "learned" (manager_weights.py) or "scripted"
-HRL_DECIDE_EVERY = 4         # re-decide at least this often, even mid-option
-HRL_EPSILON = 0.0            # training only: random masked option this often
+HRL_EPSILON = 0.0            # training only: random feasible option this often
 HRL_SHIELD_TIER_A = True     # under danger, veto moves that fail Instinct's Tier A check
 
 # ------------------------------------------------------------ options ----
@@ -165,9 +165,6 @@ CAMP_WINDOW = 12             # ...whose countdown is at most this
 PORTAL_RADIUS = 10           # PORTAL_TRAVEL: known portal entries this close
 PORTAL_MIN_GAIN = 10         # exit must be this many rounds staler than here
 PORTAL_UNKNOWN_GAIN = 30     # value of a portal whose far end we have never seen
-HUNT_RADIUS = 6              # HUNT: enemy heads this close (Manhattan)
-HUNT_MARGIN = 3              # (tuned) we must be at least this much longer than what we see
-HUNT_MIN_LEN = 5
 HUNT_AREA_CAP = 40           # flood-fill cap when measuring the enemy's room
 HUNT_W_SQUEEZE = 1.327       # (tuned) weight on shrinking the enemy's room
 HUNT_W_OWN = 0.174           # (tuned) weight on our own room
@@ -175,12 +172,4 @@ HUNT_W_CLOSE = 1.911         # (tuned) weight on reaching the tile ahead of the 
 HUNT_AHEAD = 0               # (tuned) aim this many steps in front of the enemy head
                              # (0 = its head itself: the tuner preferred plain pursuit)
 HUNT_MEMORY = 3              # follow the last sighting for this many rounds
-PINCER_MIN_LEN = 11          # (tuned) SPLIT_AND_PINCER
-PINCER_TAIL_RADIUS = 6       # enemy head this close to our tail
-ECON_MIN_LEN = 8             # (tuned) ECON_SPLIT: split when at least this long
-ECON_CHILD = 3               # (tuned) child length
-ECON_MAX_UNITS = 12          # (tuned) stop splitting at this many teammates
-ECON_LAST_ROUND = 440
-ECON_CLEAR_RADIUS = 8        # no enemy head this close
-STALL_ROUND = 400            # STALL: late game...
-STALL_MIN_LEN = 6            # ...or tiebreak holder, and at least this long
+ECON_CHILD = 3               # (tuned) ECON_SPLIT child length

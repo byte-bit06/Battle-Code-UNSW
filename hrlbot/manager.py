@@ -1,37 +1,37 @@
-"""The high-level policy: which option to run next.
+"""The high-level policy: which option to run THIS turn (decided every turn).
 
-Both managers return a RANKING of the options whose initiation set holds, so
-the Brain can fall back to the next choice if the first one has nothing to do.
+Both managers return a RANKING of the feasible options, so the Brain can fall
+back to the next choice if the first one has nothing to do this turn.
 
-ScriptedManager  plain if/else rules (the baseline the learned one must beat,
-                 and the teacher for behaviour cloning).
-LearnedManager   a small MLP scoring each option (Q-values), trained offline
+LearnedManager   the AI: a small MLP scoring every option (Q-values), trained
                  by hrl_train/train_manager.py and shipped as plain lists in
                  manager_weights.py. Pure Python: the judge's sandbox has no
-                 torch, and ~1,700 multiply-adds is cheap next to one BFS.
+                 torch, and ~2,300 multiply-adds is cheap next to one BFS.
+ScriptedManager  plain if/else rules: the teacher the AI first imitates, and
+                 the baseline it has to beat. Never shipped as the decider.
 """
 
 import config
-from options import IDX
+import features
+from options import IDX, N_OPTIONS
 
-F, CA, SC, EX, PO, HU, PI, RA, ES, DS, EC, ST = (
-    IDX["FORAGE"], IDX["CAMP_CLUSTER"], IDX["SCAVENGE"], IDX["EXPLORE"],
-    IDX["PORTAL_TRAVEL"], IDX["HUNT"], IDX["SPLIT_AND_PINCER"], IDX["RAM_TRADE"],
-    IDX["ESCAPE"], IDX["DEFENSIVE_SPLIT"], IDX["ECON_SPLIT"], IDX["STALL"])
+F, EX, RA, ES, DS = (IDX["FORAGE"], IDX["EXPLORE"], IDX["RAM_TRADE"], IDX["ESCAPE"],
+                     IDX["DEFENSIVE_SPLIT"])
 
 # feature indices used by the scripted rules (see features.BASE_NAMES)
-_N_SAFE, _DANGER = 4, 5
+_N_LEGAL = features.BASE_NAMES.index("n_legal")
+_DANGER = features.BASE_NAMES.index("danger")
 
 
 class ScriptedManager:
     """The pre-HRL bot, decomposed: Instinct (ESCAPE) whenever an enemy head is
     within INSTINCT_DANGER_DIST, otherwise the Forage engine, otherwise explore.
-    It never picks the new options; that's the learned manager's job."""
+    It never picks the new options."""
     name = "scripted"
 
     def rank(self, feats, mask):
         order = []
-        if feats[_N_SAFE] == 0:
+        if feats[_N_LEGAL] == 0:
             order.append(RA)                      # doomed: take one with us
         order.append(DS)
         if feats[_DANGER]:
@@ -52,6 +52,11 @@ class LearnedManager:
     def __init__(self, weights=None):
         if weights is None:
             import manager_weights as weights
+        n_in = features.size(N_OPTIONS)
+        if len(weights.MEAN) != n_in or len(weights.W2) != N_OPTIONS:
+            # weights from another feature/option layout would be read silently
+            # wrong (zip truncates): refuse them, make() falls back
+            raise ValueError("manager weights do not match this bot's features/options")
         self.mean = weights.MEAN
         self.std = weights.STD
         self.w1 = weights.W1          # hidden x inputs
@@ -88,7 +93,7 @@ def make(kind=None):
         try:
             return LearnedManager()
         except Exception:
-            return ScriptedManager()     # no weights yet: never ship a dead bot
+            return ScriptedManager()     # no usable weights: never ship a dead bot
     return ScriptedManager()
 
 

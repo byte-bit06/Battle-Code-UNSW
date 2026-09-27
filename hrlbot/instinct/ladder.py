@@ -1,4 +1,4 @@
-﻿"""The reflex ladder and plan memory (instinct_engine.md 4.9).
+"""The reflex ladder and plan memory (instinct_engine.md 4.9).
 
 L0 runs before any search and always yields a legal action, so a turn can
 never end with no action (which is death). Each level overwrites the answer

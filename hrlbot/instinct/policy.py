@@ -1,4 +1,4 @@
-﻿"""Move ranking, trade policy and the defensive split (4.6, 4.8, section 5).
+"""Move ranking, trade policy and the defensive split (4.6, 4.8, section 5).
 
 The lexicographic key is the whole ranking:
 

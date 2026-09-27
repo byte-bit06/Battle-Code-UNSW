@@ -1,4 +1,4 @@
-﻿hrlbot vs mybot: 19 wins, 29 losses, 0 draws  (win rate 40%, n=48)
+hrlbot vs mybot: 19 wins, 29 losses, 0 draws  (win rate 40%, n=48)
   Colosseum          W  3 L  3 D  0
   arena              W  5 L  1 D  0
   big_empty          W  2 L  4 D  0

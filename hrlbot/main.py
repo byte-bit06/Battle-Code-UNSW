@@ -2,11 +2,10 @@
 
 Every turn:
   1. build state      snapshot.py + memory.py + symmetry.py (+ sonar in)
-  2. manager          only when the current option stopped, ran for
-                      HRL_DECIDE_EVERY turns, or danger just appeared:
-                      mask options whose can_start fails, rank the rest
-  3. option           option.step(t) -> move / sprint / split; if it has
-                      nothing to do, fall back down the manager's ranking
+  2. manager (AI)     EVERY turn: mask the options that are not physically
+                      possible, rank the rest (learned policy)
+  3. option           option.step(t) -> this turn's move / sprint / split;
+                      nothing to do -> the AI's next choice
   4. safety shield    options.shield() vetoes anything that dies
   5. sonar out        comms.py, unchanged
 
@@ -74,11 +73,9 @@ class Brain:
         self.target = None
         self.options = options.make_options()
         self.manager = manager_obj  # built lazily on the first decision (see above)
-        self.cur = None             # index of the running option
-        self.cur_turns = 0
-        self.cur_danger = False
+        self.cur = None             # the option run last turn (the AI sees it)
         # training hooks (unused in a real match)
-        self.recorder = None        # fn(dict) called once per manager decision
+        self.recorder = None        # fn(dict) called once per decision (every turn)
         self.epsilon = config.HRL_EPSILON
         self.rng = None
 
@@ -93,8 +90,8 @@ class Brain:
                 mask.append(bool(o.can_start(t)))
             except Exception:
                 mask.append(False)
-        mask[EXPLORE] = True        # always available: the manager can't be stuck
-        feats = features.build(t, mask)
+        mask[EXPLORE] = True        # always feasible: the manager is never stuck
+        feats = features.build(t, mask, self.cur)
         ranked = self.manager.rank(feats, mask)
         ranked = manager.explore_rank(ranked, mask, self.epsilon, self.rng)
         return feats, mask, ranked or [EXPLORE]
@@ -111,54 +108,33 @@ class Brain:
             return None
 
     def run_options(self, t):
+        """The AI picks this turn's option; the option gives this turn's move.
+        An option keeps its memory only while the AI keeps picking it."""
+        feats, mask, ranked = self._decide(t)
         cur = self.cur
-        stopped = cur is None
-        if not stopped:
-            o = self.options[cur]
-            try:
-                stopped = o.one_shot or o.should_stop(t)
-            except Exception:
-                stopped = True
-        danger = t.danger()
-        interrupt = danger and not self.cur_danger
-        decision = None
-        if stopped or interrupt or self.cur_turns >= config.HRL_DECIDE_EVERY:
-            decision = self._decide(t)
-            ranked = decision[2]
-        else:
-            ranked = [cur]
         action, chosen = None, None
-        for n, i in enumerate(ranked[:4]):
-            if i != cur or stopped:
-                self.options[i].start(t)
+        for i in ranked[:4]:
+            o = self.options[i]
+            fresh = i != cur
+            if not fresh:
+                try:
+                    fresh = o.one_shot or o.should_stop(t)
+                except Exception:
+                    fresh = True
+            if fresh:
+                o.start(t)
             action = self._step(i, t)
             if action is not None:
                 chosen = i
                 break
-            if decision is None:     # the running option ran dry: ask the manager
-                decision = self._decide(t)
-                for j in decision[2][:3]:
-                    self.options[j].start(t)
-                    action = self._step(j, t)
-                    if action is not None:
-                        chosen = j
-                        break
-                break
-        if action is None and chosen is None:
+        if action is None:
             chosen = EXPLORE
             self.options[EXPLORE].start(t)
             action = self._step(EXPLORE, t)
-        if decision is not None:
-            self.cur_turns = 0
-            self.cur_danger = danger
-            if self.recorder is not None:
-                feats, mask, _r = decision
-                self.recorder({"round": t.snap.round, "feats": feats, "mask": mask,
-                               "option": chosen, "length": t.snap.my_len})
-        if chosen != self.cur:
-            self.cur_turns = 0
+        if self.recorder is not None:
+            self.recorder({"round": t.snap.round, "feats": feats, "mask": mask,
+                           "option": chosen, "length": t.snap.my_len})
         self.cur = chosen
-        self.cur_turns += 1
         return action
 
     # --------------------------------------------------------------- turn --
