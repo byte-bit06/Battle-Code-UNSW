@@ -64,27 +64,33 @@ LAST_TARGET = (None, None)    # (tile, distance) of this turn's plan, for CLAIM 
 
 
 # =========================================================== Stage 5 ======
-def forage_turn(snap, mem, safe, deadline):
+def forage_turn(snap, mem, safe, deadline, kinds=None, fallback=True, c=None):
     """Return a list of directions (ints). [] only when `safe` is empty.
 
-    Never returns None. Only raises ForageTimeout.
+    HRL options call this with `kinds` (a subset of 'live', 'predicted',
+    'cluster') to restrict the targets, and fallback=False to get None instead
+    of an exploration step when no target qualifies. `c` reuses a Ctx already
+    built this turn. With the defaults it never returns None.
+    Only raises ForageTimeout.
     """
     global LAST_DEBUG, LAST_TARGET
     LAST_TARGET = (None, None)
     if not safe:
         return []
-    c = make_ctx(snap, mem, safe, deadline)
+    if c is None:
+        c = make_ctx(snap, mem, safe, deadline)
     geo = c.geo
 
     cands = []
-    clusters = detect_clusters(c)
+    clusters = detect_clusters(c) if kinds is None or "cluster" in kinds else []
     for cluster in clusters:
         cc = beam_scavenge(c, cluster)
         if cc is not None:
             cands.append(cc)
-    cands += build_live_candidates(c)
-    if not clusters:                       # save budget while scavenging
-        cands += build_predictive_candidates(c)
+    if kinds is None or "live" in kinds:
+        cands += build_live_candidates(c)
+    if (kinds is None and not clusters) or (kinds is not None and "predicted" in kinds):
+        cands += build_predictive_candidates(c)     # save budget while scavenging
 
     # cheap score for everything, expensive checks only for the best few
     ranked = []
@@ -116,6 +122,8 @@ def forage_turn(snap, mem, safe, deadline):
         if config.DEBUG:
             LAST_DEBUG = f"F {best.kind}@{geo.xy(best.target)} S{best.score:.0f}"
         return list(best.first) if isinstance(best.first, list) else [best.first]
+    if not fallback:
+        return None
     late = deadline.remaining() < config.LATE_RESERVE_S   # keep the tail of the budget
     far = None if (late or not config.ENABLE_FAR_GOALS) else far_goal(c)
     if far is not None:

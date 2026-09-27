@@ -1,4 +1,4 @@
-"""Every tunable constant for the bot lives here. No magic numbers elsewhere.
+﻿"""Every tunable constant for the bot lives here. No magic numbers elsewhere.
 
 IMPORTANT - how time works on the judge:
 The judge runs Python inside a metered WebAssembly sandbox. Each turn gets
@@ -20,17 +20,32 @@ FIRST_TURN_BUDGET_S = 0.012  # first turn of a process also pays ~40M points of 
 DEBUG = False                # when True, one indicator string per turn (costs ~2.5M points)
 
 # --------------------------------------------------------------- split ----
-# Foraging-first policy: a dragon splits ONLY when it is about to die with no
-# legal move at all (a splitting parent does not move, so it survives the turn).
-# Growth splitting is off until single dragons forage and survive well.
-# NOTE: in testing, a team that never splits is eliminated more often.
-ENABLE_SPLIT = False           # growth/redundancy splitting (owned by Memory_Engine)
-ENABLE_EMERGENCY_SPLIT = True  # split instead of dying when no move is legal
-SPLIT_TARGET_UNITS = 6         # keep at least this many dragons alive
-SPLIT_MIN_LENGTH = 8           # only dragons this long bud off a child
-SPLIT_CHILD_SIZE = 3           # child length (= spawn length); parent keeps the rest
-SPLIT_LAST_ROUND = 470         # stop splitting near the end (tiebreak = longest dragon)
+# Emergency split: with no legal move at all, split instead of dying (a
+# splitting parent does not move, so it survives the turn). Growth splitting is
+# the ECON_SPLIT option now (see the HRL section at the end).
+ENABLE_EMERGENCY_SPLIT = True
 
+# ------------------------------------------------ Instinct_Engine (defence) --
+# See instinct_engine.md. In the HRL bot Instinct runs inside the ESCAPE option
+# and the shield. MEASURED for mybot (tools/instinct_arena.py --ablate):
+# Instinct doubles survival on boards with kelp structure (34/34 vs 17/34) and
+# is a wash on open ones; CPU p50 34M, max 62M of the 100M limit.
+INSTINCT_PROFILE = False     # collect per-level timings into ladder.TIMINGS
+# MEASURED on the judge: a turn that exceeds 100M points is killed as "no valid
+# action" EVEN IF a valid action was already printed, so the ladder stops itself.
+INSTINCT_L1_MAX_S = 0.020    # skip L1 if the turn has already used this much
+INSTINCT_HARD_S = 0.060      # beyond this, stop everything and end the turn
+INSTINCT_MAX_SPRINT = 3       # Tier A: longest enemy sprint we plan against
+INSTINCT_DANGER_DIST = 12     # no enemy head this close -> skip Instinct entirely.
+                              # MEASURED: the fatal box is built 4-25 rounds (median 9)
+                              # before death (tools/instinct_walkback.py).
+INSTINCT_NODE_CAP = 80        # BFS nodes per call (a node costs 25-45k points on the judge)
+INSTINCT_OPEN_DIST = 5        # "the open board" starts this far from our head (4.3)
+INSTINCT_CORRIDOR_RADIUS = 10 # give up looking for a way out past this
+INSTINCT_REGION_CAP = 48      # flood-fill cap
+INSTINCT_DEFENSIVE_SPLIT = True   # 4.8: split to survive a chamber
+INSTINCT_RAISE = False            # tests/harness: re-raise what the ladder swallows
+INSTINCT_ABLATE = ""              # tests: zero key terms ("options", "ram")
 # ------------------------------------------------------------- rewards ----
 R_LIVE = 100.0               # pearl visible now (or remembered)
 R_PREDICTED = 80.0           # spawn predicted from a countdown
@@ -92,7 +107,6 @@ HOLD_NODE_CAP = 120
 UNKNOWN_STEP_UNCERTAINTY = 0.1
 
 # ------------------------------------------------------------ explore ----
-EXPLORE_FLOOD_CAP = 24
 EXPLORE_STALE_BONUS = 3.0
 EXPLORE_MOMENTUM_BONUS = 1.5
 
@@ -134,3 +148,39 @@ BEAM_WIDTH_BIG = 8
 BEAM_HORIZON_BIG = 4
 BEAM_EXPANSION_CAP_BIG = 24
 HOLD_MAX_BIG = 8
+
+# ================================================================= HRL ====
+# Hierarchical RL (HRL_CHECKLIST.md). A manager picks an option (abstract
+# action); the option plays moves until it stops; a safety shield vetoes any
+# move that dies. Option parameters marked (tuned) were set by
+# hrl_train/tune_options.py; everything else is a design choice.
+HRL_MANAGER = "learned"      # "learned" (manager_weights.py) or "scripted"
+HRL_DECIDE_EVERY = 4         # re-decide at least this often, even mid-option
+HRL_EPSILON = 0.0            # training only: random masked option this often
+HRL_SHIELD_TIER_A = True     # under danger, veto moves that fail Instinct's Tier A check
+
+# ------------------------------------------------------------ options ----
+CAMP_RADIUS = 8              # CAMP_CLUSTER: spawn tiles considered around us
+CAMP_WINDOW = 12             # ...whose countdown is at most this
+PORTAL_RADIUS = 10           # PORTAL_TRAVEL: known portal entries this close
+PORTAL_MIN_GAIN = 10         # exit must be this many rounds staler than here
+PORTAL_UNKNOWN_GAIN = 30     # value of a portal whose far end we have never seen
+HUNT_RADIUS = 6              # HUNT: enemy heads this close (Manhattan)
+HUNT_MARGIN = 3              # (tuned) we must be at least this much longer than what we see
+HUNT_MIN_LEN = 5
+HUNT_AREA_CAP = 40           # flood-fill cap when measuring the enemy's room
+HUNT_W_SQUEEZE = 1.327       # (tuned) weight on shrinking the enemy's room
+HUNT_W_OWN = 0.174           # (tuned) weight on our own room
+HUNT_W_CLOSE = 1.911         # (tuned) weight on reaching the tile ahead of the enemy
+HUNT_AHEAD = 0               # (tuned) aim this many steps in front of the enemy head
+                             # (0 = its head itself: the tuner preferred plain pursuit)
+HUNT_MEMORY = 3              # follow the last sighting for this many rounds
+PINCER_MIN_LEN = 11          # (tuned) SPLIT_AND_PINCER
+PINCER_TAIL_RADIUS = 6       # enemy head this close to our tail
+ECON_MIN_LEN = 8             # (tuned) ECON_SPLIT: split when at least this long
+ECON_CHILD = 3               # (tuned) child length
+ECON_MAX_UNITS = 12          # (tuned) stop splitting at this many teammates
+ECON_LAST_ROUND = 440
+ECON_CLEAR_RADIUS = 8        # no enemy head this close
+STALL_ROUND = 400            # STALL: late game...
+STALL_MIN_LEN = 6            # ...or tiebreak holder, and at least this long

@@ -1,4 +1,15 @@
-__pycache__/
+﻿__pycache__/
 *.pyc
 *.replay
-   .pytest_cache/
+.pytest_cache/
+
+# unswbc rebuilds this inside every bot folder on each run / submit
+.unswbc-build/
+
+# match output and crash logs
+*.log
+*.err
+crash_log.txt
+
+# per-iteration training snapshots (each run keeps log.txt and best.json)
+hrl_train/runs/*/w_*.json

@@ -1,0 +1,28 @@
+=== tune_options 2026-09-27 13:24 iters=4 pop=10
+HUNT defaults {'HUNT_W_SQUEEZE': 1.0, 'HUNT_W_OWN': 0.5, 'HUNT_W_CLOSE': 1.0, 'HUNT_AHEAD': 2, 'HUNT_MARGIN': 2}: score -1.750 {kills 6.38, deaths 11.12, win 0.31}
+  iter 1: best -0.719 {'HUNT_W_SQUEEZE': 0.535, 'HUNT_W_OWN': 0.13, 'HUNT_W_CLOSE': 0.742, 'HUNT_AHEAD': 2, 'HUNT_MARGIN': 3} {kills 4.94, deaths 8.38, win 0.50}
+  iter 2: best -0.312 {'HUNT_W_SQUEEZE': 1.348, 'HUNT_W_OWN': 0.061, 'HUNT_W_CLOSE': 2.485, 'HUNT_AHEAD': 2, 'HUNT_MARGIN': 3} {kills 4.62, deaths 7.00, win 0.44}
+  iter 3: best -0.125 {'HUNT_W_SQUEEZE': 1.316, 'HUNT_W_OWN': 0.193, 'HUNT_W_CLOSE': 1.957, 'HUNT_AHEAD': 2, 'HUNT_MARGIN': 3} {kills 5.75, deaths 7.75, win 0.44}
+  iter 4: best 0.688 {'HUNT_W_SQUEEZE': 1.327, 'HUNT_W_OWN': 0.174, 'HUNT_W_CLOSE': 1.911, 'HUNT_AHEAD': 0, 'HUNT_MARGIN': 3} {kills 5.75, deaths 6.62, win 0.56}
+  fresh seeds: defaults -2.656 {kills 5.75, deaths 12.06, win 0.25} | tuned -0.750 {kills 5.81, deaths 8.31, win 0.25}
+  KEEP {'HUNT_W_SQUEEZE': 1.327, 'HUNT_W_OWN': 0.174, 'HUNT_W_CLOSE': 1.911, 'HUNT_AHEAD': 0, 'HUNT_MARGIN': 3}
+=== tune_options 2026-09-27 14:25 iters=3 pop=8
+ECON_SPLIT defaults {'ECON_MIN_LEN': 8, 'ECON_CHILD': 3, 'ECON_MAX_UNITS': 12}: score 5.226 {team_len 192.56, win 0.69}
+  iter 1: best 5.376 {'ECON_MIN_LEN': 6, 'ECON_CHILD': 3, 'ECON_MAX_UNITS': 14} {team_len 206.31, win 0.62}
+  iter 2: best 5.214 {'ECON_MIN_LEN': 8, 'ECON_CHILD': 2, 'ECON_MAX_UNITS': 10} {team_len 204.44, win 0.56}
+  iter 3: best 5.455 {'ECON_MIN_LEN': 8, 'ECON_CHILD': 3, 'ECON_MAX_UNITS': 13} {team_len 204.00, win 0.69}
+  fresh seeds: defaults 5.478 {team_len 198.88, win 0.75} | tuned 4.823 {team_len 191.12, win 0.50}
+  KEEP {'ECON_MIN_LEN': 8, 'ECON_CHILD': 3, 'ECON_MAX_UNITS': 12}
+RESULT {"ECON_SPLIT": {"ECON_MIN_LEN": 8, "ECON_CHILD": 3, "ECON_MAX_UNITS": 12}}
+=== tune_options 2026-09-27 15:03 iters=2 pop=6
+CAMP_CLUSTER defaults {'CAMP_WINDOW': 12, 'CAMP_RADIUS': 8}: score 0.774 {gain_per_turn 0.03, win 0.31}
+  iter 1: best 0.787 {'CAMP_WINDOW': 9, 'CAMP_RADIUS': 8} {gain_per_turn 0.03, win 0.31}
+  iter 2: best 0.713 {'CAMP_WINDOW': 13, 'CAMP_RADIUS': 8} {gain_per_turn 0.04, win 0.25}
+  fresh seeds: defaults 0.555 {gain_per_turn 0.04, win 0.19} | tuned 0.491 {gain_per_turn 0.05, win 0.12}
+  KEEP {'CAMP_WINDOW': 12, 'CAMP_RADIUS': 8}
+SPLIT_AND_PINCER defaults {'PINCER_MIN_LEN': 8, 'PINCER_TAIL_RADIUS': 6}: score -1.062 {kills 0.94, deaths 5.06, win 0.50}
+  iter 1: best -0.438 {'PINCER_MIN_LEN': 11, 'PINCER_TAIL_RADIUS': 6} {kills 0.56, deaths 2.94, win 0.38}
+  iter 2: best -0.062 {'PINCER_MIN_LEN': 11, 'PINCER_TAIL_RADIUS': 6} {kills 0.81, deaths 2.94, win 0.50}
+  fresh seeds: defaults -1.812 {kills 0.88, deaths 6.75, win 0.56} | tuned -0.188 {kills 0.56, deaths 3.19, win 0.56}
+  KEEP {'PINCER_MIN_LEN': 11, 'PINCER_TAIL_RADIUS': 6}
+RESULT {"CAMP_CLUSTER": {"CAMP_WINDOW": 12, "CAMP_RADIUS": 8}, "SPLIT_AND_PINCER": {"PINCER_MIN_LEN": 11, "PINCER_TAIL_RADIUS": 6}}

@@ -1,0 +1,13 @@
+﻿option              forced: success    mean  picks   scripted: success    mean
+FORAGE                     7/8         7.25    9.0            7/8         7.25
+CAMP_CLUSTER               8/8        10.62    7.5            8/8        14.62
+SCAVENGE                   8/8         6.00    1.0            8/8         6.00
+EXPLORE                    7/8         0.47   23.6            8/8         0.48
+PORTAL_TRAVEL              8/8         4.50    1.0            0/8       500.00
+HUNT                       0/8       500.00    7.4            0/8       500.00
+SPLIT_AND_PINCER           0/8       500.00    0.0            0/8       500.00
+RAM_TRADE                  0/8       500.00    5.0            0/8       500.00
+ESCAPE                     1/8        54.25   12.5            1/8        54.25
+DEFENSIVE_SPLIT            8/8       500.00    0.0            8/8       500.00
+ECON_SPLIT                 8/8       166.75   11.0            7/8        71.75
+STALL                      8/8       500.00   30.2            8/8       500.00

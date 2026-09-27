@@ -1,0 +1,20 @@
+﻿hrlbot vs mybot: 19 wins, 29 losses, 0 draws  (win rate 40%, n=48)
+  Colosseum          W  3 L  3 D  0
+  arena              W  5 L  1 D  0
+  big_empty          W  2 L  4 D  0
+  default            W  2 L  4 D  0
+  default_small      W  1 L  5 D  0
+  queen_of_spades    W  2 L  4 D  0
+  schooltime         W  3 L  3 D  0
+  trophy             W  1 L  5 D  0
+  option              picked  share avg turns len/turn deaths
+  EXPLORE              78557  54.3%      1.07   -0.056   1160
+  ESCAPE               51886  35.9%      3.71   -0.004   3583
+  FORAGE               13558   9.4%      2.96    0.236      4
+  DEFENSIVE_SPLIT        475   0.3%      1.07   -2.393     29
+  CAMP_CLUSTER            47   0.0%      3.13   -0.259      4
+  SCAVENGE                19   0.0%      2.84    0.000      0
+  STALL                   13   0.0%      2.77   -0.694      2
+  our deaths by cause: hit dragon 2164, hit itself 1699, head-to-head 1683
+  mean deaths/game ours 115.5 theirs 99.5
+  (226s)

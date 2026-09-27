@@ -1,0 +1,30 @@
+=== train_manager 2026-09-27 15:43 {'iters': 24, 'demo_games': 96, 'games': 32, 'steps': 1500, 'pretrain_steps': 4000, 'eval_every': 4, 'eval_games': 32, 'buffer': 400000, 'workers': 16, 'out': 'hrl_train/runs/main'}
+demonstrations: 353267 decisions from 128 games (619s); scripted win rate in them 40%
+pretrain: loss 0.843, agrees with the scripted manager on 90.0% of its decisions
+iter 0 (behaviour cloned): win rate vs mybot 56% (n=32)
+iter 1: eps 0.28 margin 0.92 loss 0.817 buffer 468913 self-play W/L 18/14 agree 90% (246s)
+iter 2: eps 0.26 margin 0.83 loss 0.783 buffer 468913 self-play W/L 8/24 agree 90% (237s)
+iter 3: eps 0.25 margin 0.75 loss 0.781 buffer 468913 self-play W/L 13/19 agree 90% (208s)
+iter 4: eps 0.23 margin 0.67 loss 0.773 buffer 468913 self-play W/L 9/23 agree 90% (237s) | eval vs mybot 50% (n=32)
+iter 5: eps 0.21 margin 0.58 loss 0.757 buffer 468913 self-play W/L 16/16 agree 90% (187s)
+iter 6: eps 0.19 margin 0.50 loss 0.758 buffer 468913 self-play W/L 12/20 agree 90% (195s)
+iter 7: eps 0.17 margin 0.42 loss 0.732 buffer 468913 self-play W/L 14/18 agree 90% (282s)
+iter 8: eps 0.16 margin 0.33 loss 0.707 buffer 468913 self-play W/L 10/22 agree 90% (193s) | eval vs mybot 31% (n=32)
+iter 9: eps 0.14 margin 0.25 loss 0.697 buffer 468913 self-play W/L 17/15 agree 89% (148s)
+iter 10: eps 0.12 margin 0.17 loss 0.658 buffer 468913 self-play W/L 16/16 agree 89% (157s)
+iter 11: eps 0.10 margin 0.08 loss 0.672 buffer 468913 self-play W/L 16/16 agree 88% (159s)
+iter 12: eps 0.09 margin 0.05 loss 0.661 buffer 468913 self-play W/L 11/21 agree 85% (210s) | eval vs mybot 44% (n=32)
+iter 13: eps 0.07 margin 0.05 loss 0.659 buffer 468913 self-play W/L 18/14 agree 86% (254s)
+iter 14: eps 0.05 margin 0.05 loss 0.626 buffer 468913 self-play W/L 17/15 agree 85% (146s)
+iter 15: eps 0.05 margin 0.05 loss 0.645 buffer 468913 self-play W/L 15/17 agree 83% (180s)
+iter 16: eps 0.05 margin 0.05 loss 0.651 buffer 468913 self-play W/L 19/12 agree 85% (176s) | eval vs mybot 50% (n=32)
+iter 17: eps 0.05 margin 0.05 loss 0.663 buffer 468913 self-play W/L 15/17 agree 85% (210s)
+iter 18: eps 0.05 margin 0.05 loss 0.665 buffer 468913 self-play W/L 18/14 agree 84% (169s)
+iter 19: eps 0.05 margin 0.05 loss 0.637 buffer 468913 self-play W/L 13/19 agree 84% (186s)
+iter 20: eps 0.05 margin 0.05 loss 0.646 buffer 468913 self-play W/L 9/23 agree 81% (203s) | eval vs mybot 47% (n=32)
+iter 21: eps 0.05 margin 0.05 loss 0.668 buffer 468913 self-play W/L 19/13 agree 82% (169s)
+iter 22: eps 0.05 margin 0.05 loss 0.668 buffer 468913 self-play W/L 14/18 agree 84% (191s)
+iter 23: eps 0.05 margin 0.05 loss 0.646 buffer 468913 self-play W/L 13/19 agree 84% (225s)
+iter 24: eps 0.05 margin 0.05 loss 0.655 buffer 468913 self-play W/L 14/18 agree 84% (225s) | eval vs mybot 38% (n=32)
+best: iter 0 with 56% vs mybot
+wrote hrl_train/runs/main\manager_weights.py

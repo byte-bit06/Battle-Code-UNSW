@@ -95,16 +95,6 @@ class WorldMemory:
             self.apply_mirror(snap)
 
     # ------------------------------------------------------- predictions --
-    def predicted_countdown(self, i: int, now: int):
-        """Countdown expected this round, or None if unknown / already reset.
-        Returns -1 for tiles that never spawn."""
-        v = self.cd_val[i]
-        if v is None:
-            return None
-        if v < 0:
-            return -1
-        rem = v - (now - self.cd_round[i])
-        return rem if rem >= 1 else None
 
     def apply_mirror(self, snap):
         """After lock-in, copy this turn's countdowns and all known kelp to the
@@ -165,8 +155,3 @@ class WorldMemory:
         return (best, best_n) if best_n >= 3 else None
 
     # --------------------------------------------------------------- hooks --
-    def ingest_external(self, pearl_tiles, round_num):
-        """Hook for the Memory_Engine sonar team: pearls reported by teammates."""
-        for p in pearl_tiles:
-            if 0 <= p < self.size:
-                self.pearls[p] = round_num

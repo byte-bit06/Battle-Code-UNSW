@@ -1,0 +1,2315 @@
+[
+ {
+  "map": "Colosseum",
+  "seed": 1000,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins by elimination",
+  "rounds": 283,
+  "outcome": "LOSS",
+  "deaths_ours": 26,
+  "deaths_theirs": 126,
+  "longest_ours": 0,
+  "longest_theirs": 8,
+  "options": {
+   "ESCAPE": [
+    139,
+    530,
+    12,
+    22
+   ],
+   "FORAGE": [
+    23,
+    74,
+    28,
+    0
+   ],
+   "EXPLORE": [
+    41,
+    44,
+    -10,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 7,
+   "head-to-head": 14,
+   "hit itself": 5
+  },
+  "secs": 23.008678674697876
+ },
+ {
+  "map": "Colosseum",
+  "seed": 1000,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins by elimination",
+  "rounds": 373,
+  "outcome": "LOSS",
+  "deaths_ours": 98,
+  "deaths_theirs": 150,
+  "longest_ours": 0,
+  "longest_theirs": 11,
+  "options": {
+   "FORAGE": [
+    48,
+    138,
+    47,
+    0
+   ],
+   "EXPLORE": [
+    403,
+    424,
+    -11,
+    7
+   ],
+   "ESCAPE": [
+    598,
+    2274,
+    90,
+    79
+   ],
+   "DEFENSIVE_SPLIT": [
+    6,
+    7,
+    -17,
+    1
+   ]
+  },
+  "causes": {
+   "hit dragon": 52,
+   "hit itself": 25,
+   "head-to-head": 21
+  },
+  "secs": 30.375721216201782
+ },
+ {
+  "map": "Colosseum",
+  "seed": 1001,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins by elimination",
+  "rounds": 296,
+  "outcome": "LOSS",
+  "deaths_ours": 61,
+  "deaths_theirs": 135,
+  "longest_ours": 0,
+  "longest_theirs": 8,
+  "options": {
+   "ESCAPE": [
+    344,
+    1357,
+    -22,
+    50
+   ],
+   "FORAGE": [
+    19,
+    66,
+    34,
+    0
+   ],
+   "EXPLORE": [
+    3,
+    3,
+    2,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    4,
+    4,
+    -10,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 27,
+   "hit itself": 9,
+   "head-to-head": 25
+  },
+  "secs": 21.0705668926239
+ },
+ {
+  "map": "Colosseum",
+  "seed": 1001,
+  "side": "B",
+  "winner": "B",
+  "result": "Team B wins by elimination",
+  "rounds": 107,
+  "outcome": "WIN",
+  "deaths_ours": 0,
+  "deaths_theirs": 1,
+  "longest_ours": 28,
+  "longest_theirs": 0,
+  "options": {
+   "ESCAPE": [
+    7,
+    23,
+    13,
+    0
+   ],
+   "FORAGE": [
+    20,
+    63,
+    31,
+    0
+   ],
+   "EXPLORE": [
+    27,
+    28,
+    -38,
+    0
+   ]
+  },
+  "causes": {},
+  "secs": 1.7989113330841064
+ },
+ {
+  "map": "Colosseum",
+  "seed": 1002,
+  "side": "A",
+  "winner": "A",
+  "result": "Team A wins by elimination",
+  "rounds": 79,
+  "outcome": "WIN",
+  "deaths_ours": 0,
+  "deaths_theirs": 1,
+  "longest_ours": 46,
+  "longest_theirs": 0,
+  "options": {
+   "ESCAPE": [
+    6,
+    18,
+    5,
+    0
+   ],
+   "FORAGE": [
+    15,
+    54,
+    32,
+    0
+   ],
+   "EXPLORE": [
+    2,
+    2,
+    1,
+    0
+   ]
+  },
+  "causes": {},
+  "secs": 0.8788926601409912
+ },
+ {
+  "map": "Colosseum",
+  "seed": 1002,
+  "side": "B",
+  "winner": "B",
+  "result": "Team B wins by elimination",
+  "rounds": 123,
+  "outcome": "WIN",
+  "deaths_ours": 5,
+  "deaths_theirs": 1,
+  "longest_ours": 20,
+  "longest_theirs": 0,
+  "options": {
+   "ESCAPE": [
+    20,
+    60,
+    28,
+    1
+   ],
+   "FORAGE": [
+    28,
+    88,
+    42,
+    0
+   ],
+   "EXPLORE": [
+    82,
+    89,
+    -80,
+    2
+   ]
+  },
+  "causes": {
+   "hit dragon": 4,
+   "head-to-head": 1
+  },
+  "secs": 1.9910829067230225
+ },
+ {
+  "map": "arena",
+  "seed": 1000,
+  "side": "A",
+  "winner": "A",
+  "result": "Team A wins by elimination",
+  "rounds": 191,
+  "outcome": "WIN",
+  "deaths_ours": 138,
+  "deaths_theirs": 57,
+  "longest_ours": 9,
+  "longest_theirs": 0,
+  "options": {
+   "FORAGE": [
+    7,
+    24,
+    16,
+    0
+   ],
+   "ESCAPE": [
+    377,
+    1413,
+    -24,
+    74
+   ],
+   "DEFENSIVE_SPLIT": [
+    12,
+    12,
+    -26,
+    0
+   ],
+   "EXPLORE": [
+    389,
+    424,
+    20,
+    22
+   ]
+  },
+  "causes": {
+   "hit dragon": 55,
+   "head-to-head": 55,
+   "hit itself": 28
+  },
+  "secs": 8.677832841873169
+ },
+ {
+  "map": "arena",
+  "seed": 1000,
+  "side": "B",
+  "winner": "B",
+  "result": "Team B wins by elimination",
+  "rounds": 454,
+  "outcome": "WIN",
+  "deaths_ours": 250,
+  "deaths_theirs": 318,
+  "longest_ours": 8,
+  "longest_theirs": 0,
+  "options": {
+   "FORAGE": [
+    13,
+    32,
+    23,
+    0
+   ],
+   "ESCAPE": [
+    716,
+    2787,
+    12,
+    161
+   ],
+   "EXPLORE": [
+    303,
+    322,
+    29,
+    15
+   ],
+   "DEFENSIVE_SPLIT": [
+    20,
+    22,
+    -53,
+    1
+   ]
+  },
+  "causes": {
+   "hit itself": 45,
+   "hit dragon": 87,
+   "head-to-head": 118
+  },
+  "secs": 43.00747108459473
+ },
+ {
+  "map": "arena",
+  "seed": 1001,
+  "side": "A",
+  "winner": "A",
+  "result": "Team A wins by elimination",
+  "rounds": 155,
+  "outcome": "WIN",
+  "deaths_ours": 110,
+  "deaths_theirs": 39,
+  "longest_ours": 14,
+  "longest_theirs": 0,
+  "options": {
+   "FORAGE": [
+    7,
+    19,
+    11,
+    0
+   ],
+   "ESCAPE": [
+    279,
+    1014,
+    -36,
+    59
+   ],
+   "EXPLORE": [
+    361,
+    395,
+    35,
+    23
+   ],
+   "DEFENSIVE_SPLIT": [
+    10,
+    10,
+    -22,
+    0
+   ],
+   "CAMP_CLUSTER": [
+    1,
+    3,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 40,
+   "head-to-head": 45,
+   "hit itself": 25
+  },
+  "secs": 11.220886707305908
+ },
+ {
+  "map": "arena",
+  "seed": 1001,
+  "side": "B",
+  "winner": "B",
+  "result": "Team B wins by elimination",
+  "rounds": 173,
+  "outcome": "WIN",
+  "deaths_ours": 148,
+  "deaths_theirs": 44,
+  "longest_ours": 6,
+  "longest_theirs": 0,
+  "options": {
+   "FORAGE": [
+    17,
+    46,
+    30,
+    0
+   ],
+   "ESCAPE": [
+    356,
+    1300,
+    26,
+    78
+   ],
+   "EXPLORE": [
+    334,
+    383,
+    -32,
+    24
+   ],
+   "DEFENSIVE_SPLIT": [
+    16,
+    21,
+    -46,
+    3
+   ]
+  },
+  "causes": {
+   "hit dragon": 55,
+   "head-to-head": 63,
+   "hit itself": 30
+  },
+  "secs": 8.989718914031982
+ },
+ {
+  "map": "arena",
+  "seed": 1002,
+  "side": "A",
+  "winner": "A",
+  "result": "Team A wins by elimination",
+  "rounds": 163,
+  "outcome": "WIN",
+  "deaths_ours": 103,
+  "deaths_theirs": 53,
+  "longest_ours": 10,
+  "longest_theirs": 0,
+  "options": {
+   "FORAGE": [
+    12,
+    33,
+    22,
+    0
+   ],
+   "ESCAPE": [
+    302,
+    1124,
+    -25,
+    63
+   ],
+   "EXPLORE": [
+    341,
+    362,
+    10,
+    18
+   ],
+   "DEFENSIVE_SPLIT": [
+    15,
+    16,
+    -34,
+    1
+   ]
+  },
+  "causes": {
+   "head-to-head": 53,
+   "hit itself": 23,
+   "hit dragon": 27
+  },
+  "secs": 13.527148962020874
+ },
+ {
+  "map": "arena",
+  "seed": 1002,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins by elimination",
+  "rounds": 206,
+  "outcome": "LOSS",
+  "deaths_ours": 55,
+  "deaths_theirs": 137,
+  "longest_ours": 0,
+  "longest_theirs": 8,
+  "options": {
+   "FORAGE": [
+    18,
+    52,
+    33,
+    0
+   ],
+   "ESCAPE": [
+    124,
+    473,
+    -25,
+    34
+   ],
+   "EXPLORE": [
+    30,
+    35,
+    -13,
+    2
+   ],
+   "CAMP_CLUSTER": [
+    1,
+    3,
+    -2,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    4,
+    5,
+    -9,
+    1
+   ]
+  },
+  "causes": {
+   "hit dragon": 18,
+   "head-to-head": 29,
+   "hit itself": 8
+  },
+  "secs": 12.431134700775146
+ },
+ {
+  "map": "big_empty",
+  "seed": 1000,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 116,
+  "deaths_theirs": 144,
+  "longest_ours": 44,
+  "longest_theirs": 55,
+  "options": {
+   "EXPLORE": [
+    4326,
+    4552,
+    -416,
+    37
+   ],
+   "FORAGE": [
+    914,
+    2726,
+    709,
+    0
+   ],
+   "ESCAPE": [
+    1235,
+    4381,
+    -174,
+    63
+   ],
+   "CAMP_CLUSTER": [
+    3,
+    11,
+    -2,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    2,
+    5,
+    -25,
+    1
+   ],
+   "STALL": [
+    2,
+    4,
+    2,
+    1
+   ],
+   "SCAVENGE": [
+    1,
+    4,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "head-to-head": 23,
+   "hit itself": 28,
+   "hit dragon": 65
+  },
+  "secs": 179.1968812942505
+ },
+ {
+  "map": "big_empty",
+  "seed": 1000,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 163,
+  "deaths_theirs": 117,
+  "longest_ours": 24,
+  "longest_theirs": 68,
+  "options": {
+   "EXPLORE": [
+    5342,
+    5675,
+    -683,
+    71
+   ],
+   "FORAGE": [
+    1403,
+    4402,
+    1111,
+    0
+   ],
+   "ESCAPE": [
+    1253,
+    4397,
+    83,
+    86
+   ],
+   "SCAVENGE": [
+    2,
+    5,
+    0,
+    0
+   ],
+   "CAMP_CLUSTER": [
+    3,
+    13,
+    -2,
+    1
+   ],
+   "STALL": [
+    3,
+    12,
+    -29,
+    1
+   ],
+   "DEFENSIVE_SPLIT": [
+    3,
+    3,
+    -18,
+    0
+   ]
+  },
+  "causes": {
+   "hit itself": 53,
+   "hit dragon": 93,
+   "head-to-head": 17
+  },
+  "secs": 195.62744998931885
+ },
+ {
+  "map": "big_empty",
+  "seed": 1001,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 130,
+  "deaths_theirs": 97,
+  "longest_ours": 36,
+  "longest_theirs": 46,
+  "options": {
+   "EXPLORE": [
+    3339,
+    3565,
+    -601,
+    62
+   ],
+   "FORAGE": [
+    1488,
+    4910,
+    1646,
+    0
+   ],
+   "ESCAPE": [
+    1167,
+    4203,
+    -75,
+    64
+   ],
+   "STALL": [
+    1,
+    4,
+    1,
+    0
+   ],
+   "CAMP_CLUSTER": [
+    3,
+    14,
+    -11,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    3,
+    3,
+    -10,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 71,
+   "hit itself": 54,
+   "head-to-head": 5
+  },
+  "secs": 174.11359310150146
+ },
+ {
+  "map": "big_empty",
+  "seed": 1001,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 135,
+  "deaths_theirs": 128,
+  "longest_ours": 27,
+  "longest_theirs": 76,
+  "options": {
+   "EXPLORE": [
+    3584,
+    3851,
+    -678,
+    66
+   ],
+   "FORAGE": [
+    1130,
+    3324,
+    873,
+    0
+   ],
+   "ESCAPE": [
+    1402,
+    4959,
+    -87,
+    65
+   ],
+   "CAMP_CLUSTER": [
+    4,
+    9,
+    0,
+    1
+   ],
+   "DEFENSIVE_SPLIT": [
+    4,
+    3,
+    -10,
+    0
+   ]
+  },
+  "causes": {
+   "hit itself": 46,
+   "hit dragon": 79,
+   "head-to-head": 10
+  },
+  "secs": 164.785062789917
+ },
+ {
+  "map": "big_empty",
+  "seed": 1002,
+  "side": "A",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "WIN",
+  "deaths_ours": 110,
+  "deaths_theirs": 124,
+  "longest_ours": 41,
+  "longest_theirs": 34,
+  "options": {
+   "EXPLORE": [
+    2579,
+    2722,
+    -521,
+    42
+   ],
+   "FORAGE": [
+    920,
+    2799,
+    868,
+    0
+   ],
+   "ESCAPE": [
+    1130,
+    3992,
+    -223,
+    64
+   ],
+   "DEFENSIVE_SPLIT": [
+    1,
+    1,
+    -2,
+    0
+   ],
+   "SCAVENGE": [
+    1,
+    4,
+    0,
+    0
+   ],
+   "CAMP_CLUSTER": [
+    2,
+    5,
+    0,
+    0
+   ],
+   "STALL": [
+    1,
+    1,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "hit itself": 35,
+   "hit dragon": 68,
+   "head-to-head": 7
+  },
+  "secs": 135.67077946662903
+ },
+ {
+  "map": "big_empty",
+  "seed": 1002,
+  "side": "B",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "WIN",
+  "deaths_ours": 161,
+  "deaths_theirs": 104,
+  "longest_ours": 40,
+  "longest_theirs": 30,
+  "options": {
+   "EXPLORE": [
+    3654,
+    3907,
+    -735,
+    67
+   ],
+   "FORAGE": [
+    1537,
+    4940,
+    1462,
+    0
+   ],
+   "ESCAPE": [
+    1367,
+    4877,
+    -119,
+    89
+   ],
+   "CAMP_CLUSTER": [
+    5,
+    18,
+    -21,
+    2
+   ],
+   "DEFENSIVE_SPLIT": [
+    1,
+    1,
+    -7,
+    0
+   ],
+   "SCAVENGE": [
+    2,
+    4,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 90,
+   "hit itself": 54,
+   "head-to-head": 17
+  },
+  "secs": 149.3361155986786
+ },
+ {
+  "map": "default",
+  "seed": 1000,
+  "side": "A",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "WIN",
+  "deaths_ours": 28,
+  "deaths_theirs": 46,
+  "longest_ours": 17,
+  "longest_theirs": 13,
+  "options": {
+   "ESCAPE": [
+    787,
+    2819,
+    -23,
+    17
+   ],
+   "FORAGE": [
+    342,
+    1003,
+    83,
+    0
+   ],
+   "EXPLORE": [
+    2962,
+    3218,
+    22,
+    7
+   ],
+   "DEFENSIVE_SPLIT": [
+    1,
+    1,
+    -3,
+    0
+   ],
+   "CAMP_CLUSTER": [
+    1,
+    1,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 13,
+   "hit itself": 10,
+   "head-to-head": 5
+  },
+  "secs": 44.03861689567566
+ },
+ {
+  "map": "default",
+  "seed": 1000,
+  "side": "B",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "WIN",
+  "deaths_ours": 81,
+  "deaths_theirs": 8,
+  "longest_ours": 15,
+  "longest_theirs": 13,
+  "options": {
+   "ESCAPE": [
+    1001,
+    3545,
+    5,
+    30
+   ],
+   "EXPLORE": [
+    3758,
+    4245,
+    -13,
+    41
+   ],
+   "FORAGE": [
+    351,
+    1024,
+    90,
+    1
+   ],
+   "DEFENSIVE_SPLIT": [
+    7,
+    7,
+    -18,
+    0
+   ]
+  },
+  "causes": {
+   "hit itself": 35,
+   "head-to-head": 22,
+   "hit dragon": 24
+  },
+  "secs": 44.015403032302856
+ },
+ {
+  "map": "default",
+  "seed": 1001,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 44,
+  "deaths_theirs": 17,
+  "longest_ours": 7,
+  "longest_theirs": 15,
+  "options": {
+   "ESCAPE": [
+    810,
+    2914,
+    -38,
+    17
+   ],
+   "EXPLORE": [
+    2178,
+    2386,
+    -27,
+    16
+   ],
+   "FORAGE": [
+    224,
+    642,
+    51,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    8,
+    8,
+    -19,
+    1
+   ]
+  },
+  "causes": {
+   "head-to-head": 10,
+   "hit dragon": 19,
+   "hit itself": 15
+  },
+  "secs": 71.6412570476532
+ },
+ {
+  "map": "default",
+  "seed": 1001,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 48,
+  "deaths_theirs": 11,
+  "longest_ours": 12,
+  "longest_theirs": 13,
+  "options": {
+   "ESCAPE": [
+    903,
+    3221,
+    -33,
+    24
+   ],
+   "EXPLORE": [
+    3708,
+    4009,
+    -25,
+    16
+   ],
+   "FORAGE": [
+    346,
+    958,
+    97,
+    1
+   ],
+   "DEFENSIVE_SPLIT": [
+    2,
+    2,
+    -4,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 20,
+   "hit itself": 13,
+   "head-to-head": 15
+  },
+  "secs": 44.929529428482056
+ },
+ {
+  "map": "default",
+  "seed": 1002,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 64,
+  "deaths_theirs": 23,
+  "longest_ours": 12,
+  "longest_theirs": 15,
+  "options": {
+   "ESCAPE": [
+    1106,
+    4087,
+    -2,
+    52
+   ],
+   "FORAGE": [
+    201,
+    547,
+    48,
+    0
+   ],
+   "EXPLORE": [
+    1385,
+    1473,
+    -12,
+    7
+   ],
+   "DEFENSIVE_SPLIT": [
+    6,
+    6,
+    -14,
+    0
+   ]
+  },
+  "causes": {
+   "head-to-head": 24,
+   "hit dragon": 20,
+   "hit itself": 20
+  },
+  "secs": 92.51273727416992
+ },
+ {
+  "map": "default",
+  "seed": 1002,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 48,
+  "deaths_theirs": 39,
+  "longest_ours": 7,
+  "longest_theirs": 16,
+  "options": {
+   "ESCAPE": [
+    716,
+    2620,
+    -11,
+    34
+   ],
+   "FORAGE": [
+    195,
+    527,
+    52,
+    0
+   ],
+   "EXPLORE": [
+    1155,
+    1269,
+    -22,
+    11
+   ],
+   "DEFENSIVE_SPLIT": [
+    2,
+    2,
+    -4,
+    0
+   ]
+  },
+  "causes": {
+   "hit itself": 19,
+   "hit dragon": 14,
+   "head-to-head": 15
+  },
+  "secs": 80.92776346206665
+ },
+ {
+  "map": "default_small",
+  "seed": 1000,
+  "side": "A",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "WIN",
+  "deaths_ours": 98,
+  "deaths_theirs": 122,
+  "longest_ours": 11,
+  "longest_theirs": 7,
+  "options": {
+   "EXPLORE": [
+    551,
+    571,
+    -9,
+    9
+   ],
+   "ESCAPE": [
+    923,
+    3486,
+    39,
+    74
+   ],
+   "FORAGE": [
+    60,
+    158,
+    24,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    10,
+    11,
+    -25,
+    1
+   ]
+  },
+  "causes": {
+   "head-to-head": 36,
+   "hit dragon": 35,
+   "hit itself": 27
+  },
+  "secs": 29.562873363494873
+ },
+ {
+  "map": "default_small",
+  "seed": 1000,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 104,
+  "deaths_theirs": 134,
+  "longest_ours": 5,
+  "longest_theirs": 7,
+  "options": {
+   "EXPLORE": [
+    272,
+    287,
+    -9,
+    9
+   ],
+   "ESCAPE": [
+    764,
+    2977,
+    -10,
+    77
+   ],
+   "FORAGE": [
+    31,
+    92,
+    23,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    11,
+    13,
+    -25,
+    2
+   ]
+  },
+  "causes": {
+   "hit itself": 27,
+   "hit dragon": 35,
+   "head-to-head": 42
+  },
+  "secs": 39.67311406135559
+ },
+ {
+  "map": "default_small",
+  "seed": 1001,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 144,
+  "deaths_theirs": 83,
+  "longest_ours": 9,
+  "longest_theirs": 11,
+  "options": {
+   "EXPLORE": [
+    617,
+    646,
+    -15,
+    11
+   ],
+   "ESCAPE": [
+    1192,
+    4598,
+    3,
+    110
+   ],
+   "FORAGE": [
+    47,
+    117,
+    24,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    9,
+    9,
+    -21,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 47,
+   "hit itself": 32,
+   "head-to-head": 65
+  },
+  "secs": 33.89220714569092
+ },
+ {
+  "map": "default_small",
+  "seed": 1001,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 166,
+  "deaths_theirs": 45,
+  "longest_ours": 6,
+  "longest_theirs": 14,
+  "options": {
+   "EXPLORE": [
+    1436,
+    1506,
+    4,
+    39
+   ],
+   "ESCAPE": [
+    1287,
+    4773,
+    -8,
+    98
+   ],
+   "FORAGE": [
+    59,
+    153,
+    34,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    21,
+    22,
+    -54,
+    1
+   ]
+  },
+  "causes": {
+   "hit dragon": 68,
+   "hit itself": 53,
+   "head-to-head": 45
+  },
+  "secs": 56.29727816581726
+ },
+ {
+  "map": "default_small",
+  "seed": 1002,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 111,
+  "deaths_theirs": 132,
+  "longest_ours": 5,
+  "longest_theirs": 15,
+  "options": {
+   "EXPLORE": [
+    171,
+    180,
+    -2,
+    3
+   ],
+   "ESCAPE": [
+    987,
+    3834,
+    58,
+    95
+   ],
+   "FORAGE": [
+    27,
+    73,
+    12,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    22,
+    23,
+    -55,
+    1
+   ]
+  },
+  "causes": {
+   "hit dragon": 33,
+   "hit itself": 33,
+   "head-to-head": 45
+  },
+  "secs": 38.26246476173401
+ },
+ {
+  "map": "default_small",
+  "seed": 1002,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 142,
+  "deaths_theirs": 76,
+  "longest_ours": 6,
+  "longest_theirs": 18,
+  "options": {
+   "EXPLORE": [
+    550,
+    569,
+    7,
+    9
+   ],
+   "ESCAPE": [
+    1268,
+    4824,
+    21,
+    116
+   ],
+   "FORAGE": [
+    31,
+    92,
+    19,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    27,
+    29,
+    -61,
+    1
+   ]
+  },
+  "causes": {
+   "hit itself": 50,
+   "hit dragon": 51,
+   "head-to-head": 41
+  },
+  "secs": 33.20737600326538
+ },
+ {
+  "map": "queen_of_spades",
+  "seed": 1000,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 72,
+  "deaths_theirs": 16,
+  "longest_ours": 14,
+  "longest_theirs": 16,
+  "options": {
+   "EXPLORE": [
+    2271,
+    2382,
+    -52,
+    44
+   ],
+   "FORAGE": [
+    207,
+    626,
+    92,
+    1
+   ],
+   "ESCAPE": [
+    353,
+    1241,
+    6,
+    11
+   ],
+   "DEFENSIVE_SPLIT": [
+    1,
+    2,
+    -2,
+    1
+   ]
+  },
+  "causes": {
+   "hit itself": 42,
+   "head-to-head": 17,
+   "hit dragon": 13
+  },
+  "secs": 24.264831066131592
+ },
+ {
+  "map": "queen_of_spades",
+  "seed": 1000,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 11,
+  "deaths_theirs": 34,
+  "longest_ours": 7,
+  "longest_theirs": 9,
+  "options": {
+   "EXPLORE": [
+    558,
+    575,
+    -1,
+    2
+   ],
+   "FORAGE": [
+    68,
+    230,
+    34,
+    0
+   ],
+   "CAMP_CLUSTER": [
+    1,
+    4,
+    0,
+    0
+   ],
+   "ESCAPE": [
+    237,
+    873,
+    -18,
+    8
+   ]
+  },
+  "causes": {
+   "hit itself": 6,
+   "head-to-head": 4,
+   "hit dragon": 1
+  },
+  "secs": 21.1325900554657
+ },
+ {
+  "map": "queen_of_spades",
+  "seed": 1001,
+  "side": "A",
+  "winner": "A",
+  "result": "Team A wins on total length",
+  "rounds": 500,
+  "outcome": "WIN",
+  "deaths_ours": 18,
+  "deaths_theirs": 17,
+  "longest_ours": 13,
+  "longest_theirs": 13,
+  "options": {
+   "EXPLORE": [
+    1497,
+    1561,
+    -61,
+    10
+   ],
+   "FORAGE": [
+    145,
+    467,
+    59,
+    0
+   ],
+   "ESCAPE": [
+    213,
+    729,
+    18,
+    5
+   ],
+   "DEFENSIVE_SPLIT": [
+    1,
+    1,
+    -2,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 11,
+   "hit itself": 7
+  },
+  "secs": 27.60702085494995
+ },
+ {
+  "map": "queen_of_spades",
+  "seed": 1001,
+  "side": "B",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "WIN",
+  "deaths_ours": 2,
+  "deaths_theirs": 3,
+  "longest_ours": 29,
+  "longest_theirs": 27,
+  "options": {
+   "EXPLORE": [
+    385,
+    407,
+    -31,
+    2
+   ],
+   "FORAGE": [
+    61,
+    209,
+    50,
+    0
+   ],
+   "ESCAPE": [
+    16,
+    51,
+    1,
+    0
+   ]
+  },
+  "causes": {
+   "hit itself": 2
+  },
+  "secs": 5.694233179092407
+ },
+ {
+  "map": "queen_of_spades",
+  "seed": 1002,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins by elimination",
+  "rounds": 71,
+  "outcome": "LOSS",
+  "deaths_ours": 2,
+  "deaths_theirs": 0,
+  "longest_ours": 0,
+  "longest_theirs": 6,
+  "options": {
+   "EXPLORE": [
+    20,
+    53,
+    2,
+    2
+   ],
+   "ESCAPE": [
+    9,
+    35,
+    3,
+    0
+   ],
+   "FORAGE": [
+    8,
+    25,
+    15,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 2
+  },
+  "secs": 1.0270390510559082
+ },
+ {
+  "map": "queen_of_spades",
+  "seed": 1002,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins by elimination",
+  "rounds": 154,
+  "outcome": "LOSS",
+  "deaths_ours": 2,
+  "deaths_theirs": 7,
+  "longest_ours": 0,
+  "longest_theirs": 11,
+  "options": {
+   "EXPLORE": [
+    55,
+    87,
+    4,
+    0
+   ],
+   "ESCAPE": [
+    16,
+    51,
+    12,
+    1
+   ],
+   "FORAGE": [
+    30,
+    98,
+    17,
+    1
+   ]
+  },
+  "causes": {
+   "hit dragon": 1,
+   "hit itself": 1
+  },
+  "secs": 2.57535457611084
+ },
+ {
+  "map": "schooltime",
+  "seed": 1000,
+  "side": "A",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "WIN",
+  "deaths_ours": 291,
+  "deaths_theirs": 266,
+  "longest_ours": 16,
+  "longest_theirs": 11,
+  "options": {
+   "EXPLORE": [
+    4694,
+    5035,
+    -113,
+    72
+   ],
+   "FORAGE": [
+    524,
+    1339,
+    227,
+    0
+   ],
+   "ESCAPE": [
+    2850,
+    10617,
+    -15,
+    187
+   ],
+   "SCAVENGE": [
+    1,
+    4,
+    0,
+    0
+   ],
+   "CAMP_CLUSTER": [
+    7,
+    24,
+    0,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    20,
+    21,
+    -54,
+    1
+   ],
+   "STALL": [
+    1,
+    1,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 123,
+   "head-to-head": 67,
+   "hit itself": 101
+  },
+  "secs": 145.5569052696228
+ },
+ {
+  "map": "schooltime",
+  "seed": 1000,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 211,
+  "deaths_theirs": 297,
+  "longest_ours": 9,
+  "longest_theirs": 13,
+  "options": {
+   "EXPLORE": [
+    2163,
+    2264,
+    -36,
+    30
+   ],
+   "FORAGE": [
+    333,
+    825,
+    135,
+    0
+   ],
+   "ESCAPE": [
+    2624,
+    9904,
+    -72,
+    155
+   ],
+   "SCAVENGE": [
+    1,
+    4,
+    0,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    20,
+    21,
+    -45,
+    1
+   ],
+   "STALL": [
+    1,
+    4,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 77,
+   "hit itself": 59,
+   "head-to-head": 75
+  },
+  "secs": 133.90536046028137
+ },
+ {
+  "map": "schooltime",
+  "seed": 1001,
+  "side": "A",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "WIN",
+  "deaths_ours": 221,
+  "deaths_theirs": 282,
+  "longest_ours": 44,
+  "longest_theirs": 16,
+  "options": {
+   "EXPLORE": [
+    2758,
+    2896,
+    -66,
+    31
+   ],
+   "FORAGE": [
+    382,
+    996,
+    155,
+    0
+   ],
+   "ESCAPE": [
+    2834,
+    10650,
+    -18,
+    155
+   ],
+   "DEFENSIVE_SPLIT": [
+    24,
+    26,
+    -67,
+    2
+   ],
+   "CAMP_CLUSTER": [
+    2,
+    3,
+    0,
+    0
+   ],
+   "SCAVENGE": [
+    4,
+    13,
+    0,
+    0
+   ],
+   "STALL": [
+    2,
+    6,
+    1,
+    0
+   ]
+  },
+  "causes": {
+   "hit itself": 80,
+   "hit dragon": 77,
+   "head-to-head": 64
+  },
+  "secs": 136.58905506134033
+ },
+ {
+  "map": "schooltime",
+  "seed": 1001,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 355,
+  "deaths_theirs": 266,
+  "longest_ours": 15,
+  "longest_theirs": 33,
+  "options": {
+   "EXPLORE": [
+    4393,
+    4637,
+    -156,
+    78
+   ],
+   "FORAGE": [
+    496,
+    1286,
+    207,
+    0
+   ],
+   "ESCAPE": [
+    3499,
+    13063,
+    89,
+    228
+   ],
+   "CAMP_CLUSTER": [
+    5,
+    14,
+    0,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    23,
+    24,
+    -61,
+    1
+   ],
+   "SCAVENGE": [
+    1,
+    3,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "hit itself": 126,
+   "hit dragon": 124,
+   "head-to-head": 105
+  },
+  "secs": 142.5151333808899
+ },
+ {
+  "map": "schooltime",
+  "seed": 1002,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins on total length",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 265,
+  "deaths_theirs": 175,
+  "longest_ours": 15,
+  "longest_theirs": 15,
+  "options": {
+   "EXPLORE": [
+    4250,
+    4482,
+    -134,
+    75
+   ],
+   "FORAGE": [
+    551,
+    1495,
+    238,
+    0
+   ],
+   "ESCAPE": [
+    2682,
+    9857,
+    12,
+    151
+   ],
+   "DEFENSIVE_SPLIT": [
+    29,
+    33,
+    -79,
+    3
+   ],
+   "CAMP_CLUSTER": [
+    5,
+    16,
+    0,
+    0
+   ],
+   "SCAVENGE": [
+    2,
+    5,
+    0,
+    0
+   ],
+   "STALL": [
+    1,
+    1,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 107,
+   "hit itself": 81,
+   "head-to-head": 77
+  },
+  "secs": 121.00366950035095
+ },
+ {
+  "map": "schooltime",
+  "seed": 1002,
+  "side": "B",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "WIN",
+  "deaths_ours": 272,
+  "deaths_theirs": 265,
+  "longest_ours": 15,
+  "longest_theirs": 13,
+  "options": {
+   "EXPLORE": [
+    3009,
+    3183,
+    -128,
+    58
+   ],
+   "FORAGE": [
+    415,
+    1098,
+    173,
+    0
+   ],
+   "ESCAPE": [
+    2616,
+    9760,
+    2,
+    168
+   ],
+   "CAMP_CLUSTER": [
+    2,
+    7,
+    0,
+    0
+   ],
+   "SCAVENGE": [
+    4,
+    8,
+    0,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    25,
+    27,
+    -65,
+    1
+   ],
+   "STALL": [
+    1,
+    3,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "head-to-head": 81,
+   "hit dragon": 108,
+   "hit itself": 83
+  },
+  "secs": 132.59527015686035
+ },
+ {
+  "map": "trophy",
+  "seed": 1000,
+  "side": "A",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "WIN",
+  "deaths_ours": 125,
+  "deaths_theirs": 138,
+  "longest_ours": 10,
+  "longest_theirs": 7,
+  "options": {
+   "EXPLORE": [
+    780,
+    810,
+    -13,
+    10
+   ],
+   "FORAGE": [
+    123,
+    349,
+    58,
+    0
+   ],
+   "ESCAPE": [
+    1972,
+    7594,
+    17,
+    106
+   ],
+   "DEFENSIVE_SPLIT": [
+    7,
+    8,
+    -14,
+    1
+   ]
+  },
+  "causes": {
+   "hit dragon": 44,
+   "hit itself": 35,
+   "head-to-head": 46
+  },
+  "secs": 82.81202006340027
+ },
+ {
+  "map": "trophy",
+  "seed": 1000,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 187,
+  "deaths_theirs": 97,
+  "longest_ours": 10,
+  "longest_theirs": 13,
+  "options": {
+   "FORAGE": [
+    213,
+    609,
+    125,
+    0
+   ],
+   "EXPLORE": [
+    1899,
+    2034,
+    -31,
+    36
+   ],
+   "ESCAPE": [
+    2234,
+    8431,
+    -72,
+    134
+   ],
+   "DEFENSIVE_SPLIT": [
+    18,
+    18,
+    -47,
+    0
+   ]
+  },
+  "causes": {
+   "hit itself": 58,
+   "hit dragon": 64,
+   "head-to-head": 65
+  },
+  "secs": 101.59284782409668
+ },
+ {
+  "map": "trophy",
+  "seed": 1001,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 164,
+  "deaths_theirs": 102,
+  "longest_ours": 7,
+  "longest_theirs": 8,
+  "options": {
+   "EXPLORE": [
+    1372,
+    1420,
+    -36,
+    19
+   ],
+   "ESCAPE": [
+    1801,
+    6776,
+    -45,
+    123
+   ],
+   "FORAGE": [
+    93,
+    266,
+    78,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    21,
+    22,
+    -50,
+    2
+   ]
+  },
+  "causes": {
+   "hit dragon": 53,
+   "head-to-head": 61,
+   "hit itself": 50
+  },
+  "secs": 79.19659662246704
+ },
+ {
+  "map": "trophy",
+  "seed": 1001,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 203,
+  "deaths_theirs": 70,
+  "longest_ours": 8,
+  "longest_theirs": 9,
+  "options": {
+   "EXPLORE": [
+    3024,
+    3160,
+    43,
+    37
+   ],
+   "ESCAPE": [
+    2252,
+    8344,
+    -55,
+    142
+   ],
+   "FORAGE": [
+    159,
+    445,
+    85,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    28,
+    29,
+    -71,
+    1
+   ],
+   "CAMP_CLUSTER": [
+    1,
+    1,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 55,
+   "hit itself": 73,
+   "head-to-head": 75
+  },
+  "secs": 98.38830256462097
+ },
+ {
+  "map": "trophy",
+  "seed": 1002,
+  "side": "A",
+  "winner": "B",
+  "result": "Team B wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 150,
+  "deaths_theirs": 95,
+  "longest_ours": 9,
+  "longest_theirs": 14,
+  "options": {
+   "EXPLORE": [
+    1156,
+    1204,
+    5,
+    15
+   ],
+   "ESCAPE": [
+    1890,
+    7135,
+    0,
+    121
+   ],
+   "FORAGE": [
+    129,
+    349,
+    58,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    20,
+    20,
+    -44,
+    0
+   ],
+   "CAMP_CLUSTER": [
+    1,
+    1,
+    0,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 46,
+   "head-to-head": 47,
+   "hit itself": 57
+  },
+  "secs": 63.93411636352539
+ },
+ {
+  "map": "trophy",
+  "seed": 1002,
+  "side": "B",
+  "winner": "A",
+  "result": "Team A wins on longest dragon",
+  "rounds": 500,
+  "outcome": "LOSS",
+  "deaths_ours": 108,
+  "deaths_theirs": 136,
+  "longest_ours": 6,
+  "longest_theirs": 10,
+  "options": {
+   "EXPLORE": [
+    390,
+    430,
+    -89,
+    3
+   ],
+   "ESCAPE": [
+    1222,
+    4719,
+    -25,
+    92
+   ],
+   "FORAGE": [
+    88,
+    259,
+    89,
+    0
+   ],
+   "DEFENSIVE_SPLIT": [
+    11,
+    11,
+    -25,
+    0
+   ]
+  },
+  "causes": {
+   "hit dragon": 41,
+   "hit itself": 36,
+   "head-to-head": 31
+  },
+  "secs": 58.51195502281189
+ }
+]

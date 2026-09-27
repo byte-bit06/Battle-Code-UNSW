@@ -141,10 +141,6 @@ class Geo:
             t = self._compute(i)
         return t[d]
 
-    def is_portal(self, i: int, d: int) -> bool:
-        sp = self.special.get(self.edge_key(i, d))
-        return sp is not None and sp[0] == EDGE_PORTAL
-
     # --------------------------------------------------------- symmetry --
     def mirror(self, i: int, hyp: str) -> int:
         """Mirror tile under hypothesis 'V' (x -> W-1-x), 'H' (y -> H-1-y) or

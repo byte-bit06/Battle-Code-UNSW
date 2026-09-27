@@ -1,0 +1,18 @@
+﻿Judge-sandbox CPU points (unswbc run --sandbox -v, maps/default_small.map, hrlbot as team A vs mybot).
+Limit: 100M points per turn. Parsed with forage_tests/sandbox_points.py.
+
+hrlbot, scripted manager (before lazy manager imports):
+normal turns  n= 4083  p50= 33.5M  p95= 50.2M  p99= 55.4M  max= 68.8M  (limit 100M)
+first turns   n=  119  p50= 79.2M  p95= 85.6M  p99= 87.5M  max= 89.8M  (limit 100M)
+CPU-limit / no-valid-action deaths: 0
+
+hrlbot, learned manager (manager + weights imported on each dragon's 2nd turn):
+normal turns  n= 2076  p50= 34.2M  p95= 51.1M  p99= 58.3M  max= 67.3M  (limit 100M)
+first turns   n=   59  p50= 75.4M  p95= 80.7M  p99= 82.8M  max= 82.8M  (limit 100M)
+CPU-limit / no-valid-action deaths: 0
+second turns  n=   54  p50= 52.6M  p95= 66.4M  max= 67.3M
+
+mybot (team B, same game as the first run):
+normal turns  n= 5003  p50= 34.3M  p95= 48.9M  p99= 54.0M  max= 61.9M  (limit 100M)
+first turns   n=  103  p50= 67.2M  p95= 72.7M  p99= 76.2M  max= 77.4M  (limit 100M)
+CPU-limit / no-valid-action deaths: 0
