@@ -16,7 +16,7 @@ def execute_turn() -> None:
     safe_dirs = get_safe_directions(ct, game)
     direction = get_fallback_move(ct, game, safe_dirs)
     if DEBUG:
-        ct.output_log(ROLE, "safe", [d.value for d in safe_dirs], "->", direction.value)
+        ct.output_log(ROLE, ct.get_position(), ct.get_dir().value, "safe", [d.value for d in safe_dirs], "->", direction.value)
     ct.make_move(direction)
 
 

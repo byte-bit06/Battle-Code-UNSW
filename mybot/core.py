@@ -170,7 +170,10 @@ def direction_toward(here: Position, target: Position, width: int, height: int,
 def get_fallback_move(ct, game, safe_dirs: list[Direction] | None = None) -> Direction:
     """Always returns a Direction, never None.
 
-    1. The first safe direction, if any.
+    1. Straight ahead if safe, otherwise the first safe direction.
+       Keeping the heading matters: a fixed N-first preference turns back
+       into any pocket it just left, and a length-3 dragon then orbits a
+       2x2 square forever (seen beside kelp on queen_of_spades).
     2. Fully blocked: a step into an adjacent enemy head (head-on, so the
        enemy dies with us and drops pearls).
     3. A portal whose far side we cannot see: unknown beats certain death.
@@ -179,7 +182,8 @@ def get_fallback_move(ct, game, safe_dirs: list[Direction] | None = None) -> Dir
     if safe_dirs is None:
         safe_dirs = get_safe_directions(ct, game)
     if safe_dirs:
-        return safe_dirs[0]
+        facing = ct.get_dir()
+        return facing if facing in safe_dirs else safe_dirs[0]
 
     here = ct.get_position()
     here_tile = ct.get_tile(here)

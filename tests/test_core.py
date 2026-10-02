@@ -247,6 +247,22 @@ def test_fallback_returns_safe_direction():
     assert get_fallback_move(ct, game) == E
 
 
+def test_fallback_keeps_heading_when_safe():
+    ct, game = Board(11, 11, (5, 5), facing="S").load()
+    assert get_fallback_move(ct, game) == S
+
+
+def test_fallback_does_not_orbit_kelp_pocket():
+    """queen_of_spades replay: leaving the kelp pocket at (19,14) facing east,
+    an N-first fallback turned straight back in and looped a 2x2 square."""
+    b = Board(25, 35, (19, 15), my_id=1, team="B", facing="E")
+    b.segment(18, 15, facing="E").segment(18, 14, facing="S")  # neck, tail
+    b.kelp(19, 14, N).kelp(19, 14, E)
+    ct, game = b.load()
+    assert get_safe_directions(ct, game) == [N, E, S]
+    assert get_fallback_move(ct, game) == E
+
+
 def test_fallback_head_on_when_surrounded():
     b = Board(11, 11, (5, 5))
     b.segment(5, 4).segment(4, 5).kelp(5, 5, E)
