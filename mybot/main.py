@@ -1,5 +1,6 @@
 import helper as unswbc
-from core import get_role, get_enemy_queen_id, get_safe_directions, get_fallback_move
+from core import QUEEN, get_role, get_enemy_queen_id, get_safe_directions
+from queen_guard import queen_turn, worker_turn
 
 ct: unswbc.Controller
 game: unswbc.Game
@@ -8,16 +9,21 @@ DEBUG = False  # stdout costs CPU points: keep False for submissions
 
 ROLE = None
 ENEMY_QUEEN_ID = None
+QUEEN_STATE = {"has_split": False}  # the queen's only memory between turns
 
 
 def execute_turn() -> None:
-    """Stage 0: no strategy yet, only the shared safe-move fallback.
-    Algorithm A (queen_guard) and B (queen_hunter) branch on ROLE here."""
-    safe_dirs = get_safe_directions(ct, game)
-    direction = get_fallback_move(ct, game, safe_dirs)
+    """Algorithm A turn structure (plan Part 5). Until Algorithm B exists,
+    the hunter runs worker logic."""
+    if ROLE == QUEEN:
+        action = queen_turn(ct, game, QUEEN_STATE)
+    else:
+        action = worker_turn(ct, game)
     if DEBUG:
-        ct.output_log(ROLE, ct.get_position(), ct.get_dir().value, "safe", [d.value for d in safe_dirs], "->", direction.value)
-    ct.make_move(direction)
+        kind, value = action
+        ct.output_log(ROLE, ct.get_position(), ct.get_dir().value, "len", ct.get_length(),
+                      "->", kind, value.value if kind == "move" else value,
+                      "safe", "".join(d.value for d in get_safe_directions(ct, game)))
 
 
 def main() -> None:
