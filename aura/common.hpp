@@ -180,6 +180,13 @@ struct Params {
     double wQueenBox = 6.0;           // moving so the queen's room drops below her need
     int feedAhead = 2;                // feeders die this many tiles ahead of the queen's facing
 
+    // opening (plan Phase 4). By round 100 vD had eaten 30 pearls to the opponent's 60 and split
+    // 15 times to their 28; 40-49% of our deaths were head-on trades, many of them early.
+    int openingEnd = 100;             // rounds 0..openingEnd-1 are the opening
+    int openingTradeMargin = 2;       // opening: trade heads only with an enemy at least this much longer
+    double splitRegionValue = 0.5;    // a split needs 2+ regions worth this much (value / (1 + claims))...
+    int splitRegionDist = 40;         // ...within this terrain path distance, one for each half
+
     // territory (plan Phase 3). vD's heads covered ~35% of the map whatever the result,
     // strong opponents 50-60%. Each dragon commits to a target region and is pulled there
     // along a terrain path field; teammates' claims spread them out.

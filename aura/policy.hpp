@@ -330,8 +330,14 @@ class Policy {
     }
     // Head-on trades are one-for-one: worth it while our army is not tiny and we do
     // not give up much more length than we take.
+    // Phase 4: the opening is for pearls and dragon count.
+    bool opening() const { return w_.t.round < p_.openingEnd; }
     bool tradeOk(int myLen, int enemyLen) const {
-        return w_.t.units >= p_.tradeMinUnits && myLen <= enemyLen + p_.tradeSlack;
+        if (w_.t.units < p_.tradeMinUnits) return false;
+        // A head-on kills both; it only pays when the enemy loses clearly more. In the opening
+        // no even trades at all: early segments compound (vD lost 40-49% of its dragons head-on).
+        if (opening()) return enemyLen >= myLen + p_.openingTradeMargin;
+        return myLen <= enemyLen + p_.tradeSlack;
     }
     bool survival() const { return w_.t.units <= p_.survivalUnits; }
 
@@ -521,6 +527,7 @@ class Policy {
                 }
             }
             if (grower_ && !queenThreat) continue;
+            if (opening() && !queenThreat) continue;  // Phase 4: no hunts in the opening but the queen's defence
             double gain = threat ? std::max<double>(protect, e.visible) - L_ : e.visible - L_;
             bool worth = queenThreat || (threat ? e.visible >= 2 : tradeOk(L_, e.visible));
             if (!worth) continue;
@@ -1142,6 +1149,26 @@ class Policy {
         return true;
     }
 
+    // Phase 4: split pacing by economy. Two foragers need food: we must have eaten recently,
+    // and there must be at least two regions within reach worth foraging (one for each half).
+    // Lenient on purpose: every rule that cut splitting hard lost to vD (0-1 of 16).
+    bool economyAllowsSplit() {
+        if (w_.t.round - w_.lastEatRound >= p_.hungryTurns) return false;
+        Board const& b = w_.board;
+        Regions const& R = w_.regions;
+        if (R.count == 0 || R.builtFor != b.version) return true;  // no region data yet: do not block
+        terrainField(b, std::vector<int>{w_.head}, fromHead_, queue_);
+        std::vector<int> rdist(R.count, INF);
+        for (int c = 0; c < b.NC; c++)
+            if (fromHead_[c] < rdist[R.of[c]]) rdist[R.of[c]] = fromHead_[c];
+        int good = 0;
+        for (int r = 0; r < R.count && good < 2; r++) {
+            if (rdist[r] > p_.splitRegionDist || static_cast<int>(R.tiles[r].size()) < p_.regionMinArea) continue;
+            if (regionValue(r) / (1.0 + w_.claimsOn(r, p_.claimMemory)) >= p_.splitRegionValue) good++;
+        }
+        return good >= 2;
+    }
+
     bool trySplit(Choice& out, Choice const& bestMove) {
         Board const& b = w_.board;
         if (late_) return false;  // Phase 1: from tiebreakRound length is kept, not divided
@@ -1209,6 +1236,7 @@ class Policy {
         }
         for (World::Seen const& s : w_.others)
             if (isEnemy(s) && b.cheb(s.head, w_.head) <= p_.splitEnemyDist) return false;
+        if (!economyAllowsSplit()) return false;  // Phase 4
 
         int keep = L_ - n;
         std::vector<int> parent(w_.body.begin(), w_.body.begin() + keep);

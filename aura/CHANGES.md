@@ -59,3 +59,21 @@ multi-zone maps (Autarky, Stripes, weakhold) our dragons stayed in their startin
   the first `openingSpreadRounds` the k-th lowest-id teammate nearby takes the k-th best region.
 - **Orbit breaker (3d)**: no pearl for `hungryTurns` (25) forces a new target outside the
   current region, with the pull multiplied by `hungryBoost` until we get there.
+
+# Changes in vE4 (Phase 4: faster, safer opening)
+
+Why: by round 100 vD had eaten 30 pearls to the opponent's 60 and split 15 times to their 28
+(even in wins: 44 vs 48); 40-49% of our deaths were head-on trades, many of them early.
+
+- **Opening** (`openingEnd`, rounds 0-99): head-on trades only against an enemy at least
+  `openingTradeMargin` (2) longer than us. A head-on kills both, so an even trade just throws
+  away early segments. This one rule (`tradeOk`) also covers the kamikaze pulls and sprint
+  trades. Defending the queen is still always allowed.
+- **No hunting in the opening** except against enemies threatening our queen (escorting only
+  starts at `earlyEnd`, 120, anyway).
+- **Split pacing by economy**: a normal split (swarm or bud) also needs a pearl within the last
+  `hungryTurns`, and at least two regions within `splitRegionDist` worth `splitRegionValue`
+  after teammates' claims, one for each half. Deliberately lenient: unexplored regions pass
+  easily, and every hard cut to splitting lost to vD in testing. Queen and tactical splits
+  are unchanged.
+- The army cap stays off.
