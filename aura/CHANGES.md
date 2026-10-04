@@ -17,3 +17,22 @@ was dead.
   at `feedRound` (400); the late-game override that started it at 350 is gone.
 - **From `tiebreakRound` (300)**: no splits (the boxed-in escape split stays); the anchor never
   trades and uses queen-level danger; escorts hold `anchorEscortRing` around the anchor.
+
+# Changes in vE2 (Phase 2: queen survival)
+
+Why: in vD's server games the queen never grew (median max length 4, 191 queen splits), died
+in 20 of 56 losses (median round 162), mostly head-on with ~3 enemies and no teammate within
+3 tiles, and 3 of her deaths in wins were crashes into our own bodies. Her survival alone
+decided several round-500 games.
+
+- **Queen splits only in the opening**: `queenSplitUntil` 500 -> 60, and a queen split always
+  leaves her at least `queenKeepLen` (4).
+- **Enemy reach field**: for each move the queen pays `wQueenReach` per enemy head that can
+  reach the tile this round, plus `wQueenMulti` per additional one.
+- **Flee mode**: with 2+ enemy heads within `queenAlarmRadius` (5), tiles further from them
+  are worth `wQueenFlee`; she may cross a known portal only if a teammate reported it good.
+- **Escape room**: the queen values reachable space (`wQueenRoom`) on top of `wSpace`.
+- **Escorts**: 2 (was 3), ring 4 (was 3).
+- **No crowding**: `wQueenAdjacent` penalty for a teammate ending on one of the queen's four
+  neighbour tiles unless defending (a penalty, not illegal, so a trapped teammate can still
+  get out).

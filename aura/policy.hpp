@@ -52,6 +52,13 @@ class Policy {
         anchorId_ = w_.anchorId(p_);
         anchor_ = late_ && anchorId_ == w_.init.id;
         if (anchor_) grower_ = true;  // the anchor plays safe: no trades, queen-level caution
+        alarm_ = false;
+        if (queen_) {
+            int close = 0;
+            for (World::Seen const& s : w_.others)
+                if (isEnemy(s) && b.cheb(s.head, w_.head) <= p_.queenAlarmRadius) close++;
+            alarm_ = close >= 2;  // Phase 2: two or more enemy heads close, flee
+        }
         // A fresh child's setup can eat most of its first turn late in the game:
         // then play a lean one-step turn.
         lean_ = !extraStep_ && clockNow() > turnDeadline_ - p_.leanMargin;
@@ -288,6 +295,7 @@ class Policy {
     bool late_ = false;           // round >= tiebreakRound
     int anchorId_ = -1;           // the dragon the team grows for the tiebreak
     bool anchor_ = false;         // late, and we are the anchor
+    bool alarm_ = false;          // we are the queen and 2+ enemy heads are within queenAlarmRadius
     int escortRing_ = 0;          // ring we hold around escortOf_
     // our queen, seen from a teammate
     int queenHead_ = -1;          // her head if visible, -1 otherwise
@@ -653,7 +661,11 @@ class Policy {
         if (extraStep_ && k == 0 && (dest < 0 || !w_.visible(dest))) return c;
         // The queen never crosses a portal, known or not, and never plans through one.
         // (If a portal is its only way out, decide()'s last-resort fallback still takes it.)
-        if (queen_ && b.side(head, d).kind == 2) return c;
+        if (queen_ && b.side(head, d).kind == 2) {
+            // Phase 2: only a known portal a teammate reported as good (flee through safe space).
+            int pid = b.side(head, d).pid;
+            if (dest < 0 || pid < 0 || w_.portalScore(pid, p_.reportWait) <= 0) return c;
+        }
         if (dest < 0) {
             if (b.side(head, d).kind == 2) {
                 // Unknown portal: we have not seen the other side, so nothing is searched
@@ -878,6 +890,25 @@ class Policy {
                 if (isEnemy(s) && distToHead(dist, s.head) <= 1) danger += p_.wDanger * w;
         }
         if (queen_ && k == 0) {
+            // Phase 2: count the enemy heads that can reach this tile this round (their free
+            // steps plus what they can pay, capped by reachCap; +1 for the step onto us), and
+            // charge extra when several can.
+            int reachers = 0;
+            for (EnemyField const& e : enemies_)
+                if (e.dist[dest] != INF && e.dist[dest] <= reachOf(e.visible) + 1) reachers++;
+            danger += p_.wQueenReach * reachers;
+            if (reachers >= 2) danger += p_.wQueenMulti * (reachers - 1);
+            if (alarm_) {
+                // Flee: the further this tile is from the close enemy heads, the better.
+                int cap = 2 * p_.queenAlarmRadius;
+                double away = 0;
+                for (EnemyField const& e : enemies_)
+                    if (b.cheb(e.head, w_.head) <= p_.queenAlarmRadius)
+                        away += std::min(e.dist[dest] == INF ? cap : e.dist[dest], cap) / static_cast<double>(cap);
+                value += p_.wQueenFlee * away;
+            }
+        }
+        if (queen_ && k == 0) {
             // The queen's sonar (World::enemyEcho): steer off directions where a recent ray
             // met an enemy first, and lean toward ones where it met a teammate.
             int age = w_.t.round - w_.enemyEcho[d];
@@ -893,6 +924,8 @@ class Policy {
             if (!queen_ && queenHead_ >= 0 && !defending_) {
                 int ch = b.cheb(dest, queenHead_);
                 if (ch <= p_.queenSpaceRadius) danger += p_.wQueenSpace * (p_.queenSpaceRadius + 1 - ch);
+                for (int q = 0; q < 4; q++)
+                    if (b.nb[queenHead_ * 4 + q] == dest) danger += p_.wQueenAdjacent;  // Phase 2
                 if (ch <= p_.queenBoxRadius && queenRoomBefore_ >= 0) {
                     // Would this move shrink the queen's room below what she needs?
                     int after = queenNav_.flood(b, queenHead_, blk, queenNeed_ + 1);
@@ -934,6 +967,7 @@ class Policy {
         c.stepTerm = (c.eat ? p_.eatBonus : 0.0) - danger;
         if (viaReverse) c.stepTerm -= p_.wReverse;
         if (k == 0) c.stepTerm -= cramp;  // the real move pays it inside deeper plans too
+        if (queen_) value += p_.wQueenRoom * std::min(space, need) / need;  // Phase 2: keep escape room
         c.score = value + c.stepTerm + p_.wSpace * std::min(space, need) / need - (k == 0 ? 0.0 : cramp);
         if (space < hardNeed && !viaReverse) {
             c.score = -1000.0 + space;  // vetoed, kept only as a last resort
@@ -996,6 +1030,8 @@ class Policy {
             if (b.cheb(s.head, w_.head) <= r) return false;
         }
         int n = L_ / 2, keep = L_ - n;
+        if (keep < p_.queenKeepLen) n = L_ - p_.queenKeepLen, keep = p_.queenKeepLen;  // Phase 2
+        if (n < 2) return false;
         std::vector<int> parent(w_.body.begin(), w_.body.begin() + keep);
         std::vector<int> child(w_.body.rbegin(), w_.body.rbegin() + n);
         std::vector<int> blk = base_;

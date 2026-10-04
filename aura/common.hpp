@@ -99,7 +99,9 @@ struct Params {
     double growerDanger = 3.0;        // extra danger multiplier for growers
     int swarmSplitLen = 4;            // swarm dragons split in half at this length (tested: raising it starves the army)
     int swarmSplitLenEarly = 4;       // ...before earlyEnd (kept separate so early and later splitting can be tuned apart)
-    int queenSplitUntil = 500;        // the queen may split before this round (0: never). Tested: 0 or 120 lost almost every game
+    int queenSplitUntil = 60;         // the queen splits only in the opening, to build the first army (Phase 2;
+                                      // vD: 500, so she never grew: median max length 4). 0 never; 500 always.
+    int queenKeepLen = 4;             // a queen split always leaves her at least this long
     int queenSplitMinLen = 4;         // ...only when at least this long
     int queenCrowdRadius = -1;        // ...and no teammate head this close to her (-1: off; 3 tested worse)
     int queenReverse = 1;             // a truly boxed-in queen may reverse-split (a 2-long queen beats a dead one)
@@ -121,9 +123,9 @@ struct Params {
 
     // squads
     int squadSize = 3;                // per enemy target: 1 attacker + (squadSize-1) supporters
-    int escortCount = 3;              // swarm dragons that stay around a visible grower
+    int escortCount = 2;              // swarm dragons that stay around a visible grower (Phase 2: was 3)
     int escortRadius = 5;             // enemy head this close to a grower is a threat
-    int escortRing = 3;               // escorts hold this distance from the grower
+    int escortRing = 4;               // escorts hold this distance from the grower (Phase 2: was 3, too close)
     int supportRing = 3;              // supporters hold this distance from the target, ready to eat
     double wHunt = 1.5;
     double wEscort = 0.8;
@@ -192,6 +194,14 @@ struct Params {
     // crosses a portal, and steers by its own sonar away from enemies.
     double queenDanger = 5.0;         // danger multiplier for the queen (growers use growerDanger)
     int queenThreatRadius = 5;        // enemy head this close to our queen: teammates go for it
+    // queen survival (plan Phase 2). On the server she died head-on with ~3 enemies and no
+    // teammate within 3 tiles: being reachable by several heads at once is what kills her.
+    double wQueenReach = 2.0;         // per enemy head that can reach the tile this round
+    double wQueenMulti = 4.0;         // extra per additional enemy head that can reach it
+    int queenAlarmRadius = 5;         // 2+ enemy heads this close (Chebyshev): flee mode
+    double wQueenFlee = 3.0;          // flee mode: value of distance from the alarm heads
+    double wQueenRoom = 1.0;          // the queen values escape room (reachable tiles) on top of wSpace
+    double wQueenAdjacent = 6.0;      // a teammate ending on one of the queen's 4 neighbour tiles
     int sonarMemory = 4;              // rounds a sonar echo for one direction stays relevant
     double wSonarEnemy = 3.0;         // moving the way a recent ray hit an enemy
     double wSonarAlly = 0.5;          // moving the way a recent ray hit a teammate
