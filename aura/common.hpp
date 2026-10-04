@@ -180,6 +180,25 @@ struct Params {
     double wQueenBox = 6.0;           // moving so the queen's room drops below her need
     int feedAhead = 2;                // feeders die this many tiles ahead of the queen's facing
 
+    // territory (plan Phase 3). vD's heads covered ~35% of the map whatever the result,
+    // strong opponents 50-60%. Each dragon commits to a target region and is pulled there
+    // along a terrain path field; teammates' claims spread them out.
+    int regionSize = 8;               // block size; each block is split into its connected parts
+    double wRegion = 1.5;             // pull toward the target region (regionGamma per tile of path)
+    double regionGamma = 0.97;        // long-range discount (0.97^20 = 0.54, 0.97^60 = 0.16)
+    int regionCommit = 25;            // rounds a target is kept before choosing again
+    double regionDone = 0.3;          // in the target and its value fell below this share: choose again
+    double regionPearl = 1.0;         // region value: per pearl believed there
+    double regionBed = 0.3;           // ...per known pearl bed (hot beds weigh more)
+    double regionUnseen = 2.0;        // ...times the share of its tiles never seen
+    double regionStale = 1.0;         // ...times staleness (rounds since we last saw it / regionStaleCap)
+    int regionStaleCap = 120;
+    int regionMinArea = 4;            // ignore tiny regions
+    int claimMemory = 15;             // rounds a teammate's region claim counts
+    int openingSpreadRounds = 30;     // opening: the k-th lowest id nearby takes the k-th best region
+    int hungryTurns = 25;             // no pearl for this long: leave this region (orbit breaker)
+    double hungryBoost = 2.5;         // pull multiplier while hungry
+
     // tiebreak and anchor (plan Phase 1). Round-500 order: queen length, then longest
     // dragon, then total length. From tiebreakRound we stop splitting and grow ONE anchor:
     // our queen if she is alive, otherwise our longest dragon.
@@ -212,7 +231,9 @@ inline Params const kParams{};
 // Radio packets (sonar values). Sonar carries no sender or team, so every packet
 // we send is tagged: bits 60-63 type, bits 52-59 a team signature, bits 0-51 payload.
 // Anything whose signature does not match is ignored (enemy rays reach us too).
-enum PacketType : uint64_t { PKT_HOT = 1, PKT_PORTAL_END = 3, PKT_PORTAL_REPORT = 4, PKT_STATUS = 5 };
+enum PacketType : uint64_t { PKT_HOT = 1, PKT_PORTAL_END = 3, PKT_PORTAL_REPORT = 4, PKT_STATUS = 5, PKT_CLAIM = 6 };
+// PKT_CLAIM payload: a tile of the target region (16 bits) << 20 | dragon id (16 bits) << 4.
+// A tile, not a region id: region ids depend on each dragon's own map knowledge.
 // PKT_STATUS payload: dragon id (16 bits) << 20 | its length (12 bits) << 8.
 inline uint64_t teamSig(char team) { return team == 'A' ? 0xB7u : 0x5Du; }
 inline uint64_t packet(PacketType type, char team, uint64_t payload) {

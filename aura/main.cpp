@@ -77,6 +77,10 @@ int main() {
                     bool changed = world.notePortal(pid, orient, world.board.X(c), world.board.Y(c));
                     if (changed) world.board.rebuild();
                 }
+            } else if (type == PKT_CLAIM) {
+                int tile = static_cast<int>((payload >> 20) & 0xFFFF);
+                int id = static_cast<int>((payload >> 4) & 0xFFFF);
+                if (id != init.id && tile < world.board.NC) world.noteClaim(tile, id, turn.round);
             } else if (type == PKT_STATUS) {
                 int id = static_cast<int>((payload >> 20) & 0xFFFF);
                 int len = static_cast<int>((payload >> 8) & 0xFFF);
@@ -114,7 +118,20 @@ int main() {
         uint64_t status = packet(PKT_STATUS, init.team,
                                  (static_cast<uint64_t>(init.id & 0xFFFF) << 20) |
                                  (static_cast<uint64_t>(std::min(world.t.length, 4095)) << 8));
-        if (broadcastCount < 4) out.ping(status, dirs[broadcastCount++]);
+        // Phase 3: on odd rounds that ray carries our target region instead (as one of its
+        // tiles), so teammates spread over the map rather than all chasing the same area.
+        bool claimTurn = turn.round % 2 == 1 && world.targetRegion >= 0 &&
+                         world.targetRegion < static_cast<int>(world.regions.tiles.size());
+        if (broadcastCount < 4) {
+            if (claimTurn) {
+                int tile = world.regions.tiles[world.targetRegion].front();
+                out.ping(packet(PKT_CLAIM, init.team, (static_cast<uint64_t>(tile & 0xFFFF) << 20) |
+                                                          (static_cast<uint64_t>(init.id & 0xFFFF) << 4)),
+                         dirs[broadcastCount++]);
+            } else {
+                out.ping(status, dirs[broadcastCount++]);
+            }
+        }
 
         // Priority 1: Hotspots
         for (int c = 0; c < world.board.NC && broadcastCount < 4; c++) {

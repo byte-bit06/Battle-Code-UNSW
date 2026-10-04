@@ -2,6 +2,7 @@
 
 #include "board.hpp"
 #include "io.hpp"
+#include "regions.hpp"
 
 namespace bc {
 
@@ -156,6 +157,30 @@ struct World {
         return best;
     }
 
+    // ---- territory (plan Phase 3) --------------------------------------------------
+    Regions regions;
+    int targetRegion = -1;        // region we are heading for (id in our own `regions`)
+    int targetUntil = -1;         // round we choose again at the latest
+    double targetValue0 = 0;      // its value when chosen
+    int lastEatRound = -1;        // last round we ate a pearl
+    int hungryRetarget = -1;      // earliest round hunger may force another change
+    std::vector<int> regionField; // terrain path distance to the target region
+    int fieldRegion = -1, fieldVersion = -1;
+    struct Claim { int tile; int id; int round; };
+    std::vector<Claim> claims;    // teammates' targets (one per dragon, newest kept)
+    void noteClaim(int tile, int id, int round) {
+        for (Claim& c : claims)
+            if (c.id == id) { c = {tile, id, round}; return; }
+        claims.push_back({tile, id, round});
+    }
+    int claimsOn(int region, int memory) const {
+        int n = 0;
+        for (Claim const& c : claims)
+            if (c.id != init.id && t.round - c.round <= memory && c.tile >= 0 &&
+                c.tile < static_cast<int>(regions.of.size()) && regions.of[c.tile] == region) n++;
+        return n;
+    }
+
     bool visible(int c) const { return visRound[c] == t.round; }
 
     bool bodyKnown() const {
@@ -299,6 +324,7 @@ struct World {
             for (Part const& part : t.parts)
                 if (part.id == s.id) s.visible++;
 
+        if (lastEatRound < 0) lastEatRound = t.round;  // a new process counts from its first turn
         noteLen(teamLens, init.id, t.length, t.round, true);
         for (Seen const& s : others)
             noteLen(s.team == init.team ? teamLens : rivalLens, s.id, s.visible, t.round, false);
@@ -386,6 +412,7 @@ struct World {
         if (eat) {
             t.length++;
             seenPearl[dest] = 0;
+            lastEatRound = t.round;
         }
         head = dest;
         t.dir = dir;

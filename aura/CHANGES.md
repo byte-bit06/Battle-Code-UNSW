@@ -36,3 +36,26 @@ decided several round-500 games.
 - **No crowding**: `wQueenAdjacent` penalty for a teammate ending on one of the queen's four
   neighbour tiles unless defending (a penalty, not illegal, so a trapped teammate can still
   get out).
+
+# Changes in vE3 (Phase 3: territory and dispersion)
+
+Why: vD's heads covered ~35% of the map in rounds 0-149 whatever the result; in losses the
+opponent covered 45-59% and visited 64% of the pearl-spawn tiles to our 38%. On corridor and
+multi-zone maps (Autarky, Stripes, weakhold) our dragons stayed in their starting zone.
+
+- **Regions (3a, `regions.hpp`)**: 8x8 blocks, each split into its connected parts, so every
+  region is one connected area (on Stripes each corridor piece is its own region). Region
+  value = pearls believed there + known beds (hot beds weigh more) + share never seen +
+  staleness. Each dragon commits to a target region for `regionCommit` rounds (or until it
+  is there and the value has dropped below `regionDone`), and a terrain path field pulls it
+  there (`wRegion`, `regionGamma`). The old single-tile explore mode is retired; looping now
+  means "commit to a different region". The revisit penalty stays.
+- **Gateways (3b)**: the path field follows gaps and known portals, so the way into another
+  zone goes through its gateways; portal reports still score each crossing. (No separate
+  zone graph: the connected regions plus the field do that job.)
+- **Dispersion (3c)**: `PKT_CLAIM` broadcasts each dragon's target (as a tile, since region ids
+  depend on each dragon's own map knowledge) on odd rounds, on the ray that carries the status
+  on even rounds. A region's value is divided by 1 + the number of teammates claiming it. In
+  the first `openingSpreadRounds` the k-th lowest-id teammate nearby takes the k-th best region.
+- **Orbit breaker (3d)**: no pearl for `hungryTurns` (25) forces a new target outside the
+  current region, with the pull multiplied by `hungryBoost` until we get there.

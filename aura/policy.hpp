@@ -40,6 +40,9 @@ class Policy {
         farPow_.resize(kPowSize);
         farPow_[0] = 1.0;
         for (int i = 1; i < kPowSize; i++) farPow_[i] = farPow_[i - 1] * p_.gammaFar;
+        regionPow_.resize(kPowSize);
+        regionPow_[0] = 1.0;
+        for (int i = 1; i < kPowSize; i++) regionPow_[i] = regionPow_[i - 1] * p_.regionGamma;
     }
 
     Choice decide() {
@@ -69,6 +72,7 @@ class Policy {
         buildSquadTargets();
         buildQueenInfo();
         if (!extraStep_) maybeStartExplore();
+        updateRegionTarget(!extraStep_);
 
         // End-game feeding (see Params::feedRound). Small dragons feed the lowest-id
         // teammate they can see with an id below their own. Our queen has the team's
@@ -242,6 +246,8 @@ class Policy {
     double gp(int k) const { return k < 0 ? 1.0 : k >= kPowSize ? 0.0 : gammaPow_[k]; }
     std::vector<double> farPow_;
     double fp(int k) const { return k < 0 ? 1.0 : k >= kPowSize ? 0.0 : farPow_[k]; }
+    std::vector<double> regionPow_;
+    double rp(int k) const { return k < 0 ? 1.0 : k >= kPowSize ? 0.0 : regionPow_[k]; }
     struct Hot { int cell; double rate; };
     std::vector<Hot> hot_;
 
@@ -296,6 +302,9 @@ class Policy {
     int anchorId_ = -1;           // the dragon the team grows for the tiebreak
     bool anchor_ = false;         // late, and we are the anchor
     bool alarm_ = false;          // we are the queen and 2+ enemy heads are within queenAlarmRadius
+    bool forceRetarget_ = false;  // looping: choose a different region this turn
+    double regionPull_ = 0;       // this turn's pull toward the target region (0: none)
+    std::vector<int> fromHead_, queue_;
     int escortRing_ = 0;          // ring we hold around escortOf_
     // our queen, seen from a teammate
     int queenHead_ = -1;          // her head if visible, -1 otherwise
@@ -571,21 +580,97 @@ class Policy {
 
     // Looping (our head stood here loopHits times lately): pick the nearest stale or
     // never-seen tile at least 4 moves away and head for it for a while.
+    // Looping (our head stood here loopHits times lately): Phase 3 replaces the old
+    // single-tile explore target with "commit to a different region" (3d).
     void maybeStartExplore() {
+        if (w_.recentCount(w_.head) >= p_.loopHits) forceRetarget_ = true;
+    }
+
+    // ---- territory (plan Phase 3) ----------------------------------------------------
+
+    // Value of a region: pearls believed there, known beds (hot beds more), never-seen
+    // share, and how long since we last looked.
+    double regionValue(int r) const {
         Board const& b = w_.board;
-        if (w_.exploreTarget >= 0 || w_.recentCount(w_.head) < p_.loopHits) return;
-        int best = -1, bestD = INF, far = -1, farD = -1;
-        for (int c = 0; c < b.NC; c++) {
-            int d = myDist_[c];
-            if (d == INF || d < 4) continue;
-            if (d > farD) far = c, farD = d;
-            bool stale = w_.seenRound[c] < 0 || w_.t.round - w_.seenRound[c] >= p_.staleAge;
-            if (stale && d < bestD) best = c, bestD = d;
+        auto const& ts = w_.regions.tiles[r];
+        double pearls = 0, beds = 0;
+        int unseen = 0, last = -1;
+        for (int c : ts) {
+            if (belief_[c] > 0.02) pearls += belief_[c];
+            if (b.bed[c] == 1) {
+                double rate = b.gapMax[c] > 0 ? 2.0 / (b.gapMin[c] + b.gapMax[c]) : 0.0;
+                beds += 1.0 + 10.0 * rate;
+            }
+            if (w_.seenRound[c] < 0) unseen++;
+            else last = std::max(last, w_.seenRound[c]);
         }
-        if (best < 0) best = far;  // everything is fresh: at least go somewhere else
-        if (best < 0) return;
-        w_.exploreTarget = best;
-        w_.exploreUntil = w_.t.round + p_.exploreTurns;
+        int age = last < 0 ? p_.regionStaleCap : std::min(p_.regionStaleCap, w_.t.round - last);
+        return p_.regionPearl * pearls + p_.regionBed * beds +
+               p_.regionUnseen * unseen / static_cast<double>(ts.size()) +
+               p_.regionStale * age / static_cast<double>(p_.regionStaleCap);
+    }
+
+    // Choose the target region: value / (1 + teammates' claims), discounted by terrain path
+    // distance. In the opening the k-th lowest-id teammate nearby takes the k-th best one,
+    // so the starting dragons spread out instead of clumping (3c).
+    void chooseRegion(int exclude) {
+        Board const& b = w_.board;
+        Regions const& R = w_.regions;
+        terrainField(b, std::vector<int>{w_.head}, fromHead_, queue_);
+        std::vector<int> rdist(R.count, INF);
+        for (int c = 0; c < b.NC; c++)
+            if (fromHead_[c] < rdist[R.of[c]]) rdist[R.of[c]] = fromHead_[c];
+        std::vector<std::pair<double, int>> cand;
+        for (int r = 0; r < R.count; r++) {
+            if (r == exclude || rdist[r] == INF || static_cast<int>(R.tiles[r].size()) < p_.regionMinArea) continue;
+            double v = regionValue(r) / (1.0 + w_.claimsOn(r, p_.claimMemory)) * rp(rdist[r]);
+            cand.push_back({v, r});
+        }
+        if (cand.empty()) return;
+        std::sort(cand.begin(), cand.end(), [](auto const& x, auto const& y) { return x.first > y.first; });
+        size_t pick = 0;
+        if (w_.t.round < p_.openingSpreadRounds) {
+            int rank = 0;
+            for (World::Seen const& s : w_.others)
+                if (!isEnemy(s) && s.id < w_.init.id && b.cheb(s.head, w_.head) <= 2 * p_.regionSize) rank++;
+            pick = std::min(cand.size() - 1, static_cast<size_t>(rank));
+        }
+        w_.targetRegion = cand[pick].second;
+        w_.targetUntil = w_.t.round + p_.regionCommit;
+        w_.targetValue0 = std::max(0.05, regionValue(w_.targetRegion));
+    }
+
+    // Keep the regions, the target and its path field up to date; set this turn's pull.
+    void updateRegionTarget(bool mayChoose) {
+        Board const& b = w_.board;
+        Regions& R = w_.regions;
+        regionPull_ = 0;
+        if (R.builtFor != b.version) {
+            R.build(b, p_.regionSize);  // terrain knowledge changed: ids changed too
+            w_.targetRegion = -1;
+            w_.fieldRegion = -1;
+        }
+        int here = R.of[w_.head];
+        bool hungry = w_.t.round - w_.lastEatRound >= p_.hungryTurns;
+        if (mayChoose) {
+            int exclude = -1;
+            bool again = w_.targetRegion < 0 || w_.t.round > w_.targetUntil;
+            if (!again && here == w_.targetRegion && regionValue(here) < p_.regionDone * w_.targetValue0) again = true;
+            if (forceRetarget_) again = true, exclude = here;
+            if (hungry && w_.t.round >= w_.hungryRetarget) {
+                // Orbit breaker (3d): nothing eaten for a while, leave this region for good.
+                again = true, exclude = here;
+                w_.hungryRetarget = w_.t.round + p_.hungryTurns;
+            }
+            if (again) chooseRegion(exclude);
+        }
+        if (w_.targetRegion < 0 || w_.targetRegion >= R.count) return;
+        if (w_.fieldRegion != w_.targetRegion || w_.fieldVersion != b.version) {
+            terrainField(b, R.tiles[w_.targetRegion], w_.regionField, queue_);
+            w_.fieldRegion = w_.targetRegion;
+            w_.fieldVersion = b.version;
+        }
+        if (here != w_.targetRegion) regionPull_ = p_.wRegion * (hungry ? p_.hungryBoost : 1.0);
     }
 
     // One feeder at a time: the visible small teammate closest to the spot (lowest id on
@@ -824,6 +909,15 @@ class Policy {
         if (w_.exploreTarget >= 0 && dist[w_.exploreTarget] != INF) {
             value += p_.wExploreTarget * fp(dist[w_.exploreTarget] + k);
             why = "explore";
+        }
+        // Territory (Phase 3): pull toward the target region along the terrain path field.
+        // It follows gaps and known portals, so routes to another zone go via its gateways.
+        if (regionPull_ > 0 && w_.fieldRegion == w_.targetRegion && !w_.regionField.empty()) {
+            int dd = w_.regionField[dest];
+            if (dd != INF) {
+                value += regionPull_ * rp(dd + k);
+                if (why.empty()) why = "region";
+            }
         }
         for (Hunt const& h : hunts_) {
             int dd = distToHead(dist, h.enemy->head);

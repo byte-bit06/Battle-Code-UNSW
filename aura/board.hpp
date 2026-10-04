@@ -14,6 +14,7 @@ struct Edge {
 
 struct Board {
     int W = 0, H = 0, NC = 0;
+    int version = 0;          // bumped on every rebuild: cached regions/fields know when they are stale
     std::vector<Edge> hE, vE;
     std::vector<int8_t> bed;  // spawns pearls (1), not (0), unknown (-1)
     std::vector<int16_t> gapMin, gapMax;
@@ -61,6 +62,7 @@ struct Board {
     }
 
     void rebuild() {
+        version++;
         nb.assign(NC * 4, -1);
         portalSide.assign(NC, 0);
         for (int c = 0; c < NC; c++)
