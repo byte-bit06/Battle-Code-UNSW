@@ -180,6 +180,22 @@ struct Params {
     double wQueenBox = 6.0;           // moving so the queen's room drops below her need
     int feedAhead = 2;                // feeders die this many tiles ahead of the queen's facing
 
+    // opponent style (plan Phase 6). Cognoscenti (0-5 vs vD) lost 67% of its dragons head-on:
+    // it trades and wins by numbers. shark++ (0-5) lost 83% to its own mistakes but out-expanded us.
+    int styleMinDeaths = 6;           // enemy deaths seen before we judge their style
+    double tradeHeavyShare = 0.5;     // head-on share of their deaths: a trader
+    double sloppyShare = 0.6;         // self-inflicted share of their deaths: a sloppy expander
+    int approachMinObs = 40;          // enemy-head moves near us seen before judging aggression
+    double approachShare = 0.6;       // share of those moving closer to us: a trader
+    int tradeHeavyMargin = 1;         // vs a trader: trade only with an enemy at least this much longer
+    double tradeHeavyExposure = 1.5;  // vs a trader: enemy sprint reach weighs this much more
+    double wPair = 0.0;               // keep a teammate about pairRing away (off unless vs a trader)
+    double wPairTradeHeavy = 0.5;     // ...vs a trader: pairs pick up the drops after a trade
+    int pairRing = 3;
+    int pairMaxDist = 8;              // only partners this close (path distance) count
+    int sloppyOpeningEnd = 200;       // vs a sloppy expander: the careful opening lasts longer...
+    double sloppyRegionBoost = 1.3;   // ...and territory pulls harder
+
     // traps and congestion (plan Phase 5). 60% of vD's deaths were self-inflicted (opponents
     // 36%): 2402 walls with almost never a free neighbour (walked into dead ends) and 1208
     // crashes into bodies, mostly teammates'.
@@ -252,7 +268,8 @@ enum PacketType : uint64_t { PKT_HOT = 1, PKT_PORTAL_END = 3, PKT_PORTAL_REPORT 
 // PKT_CORRIDOR payload: the corridor's id tile (16 bits) << 20 | dragon id (16 bits) << 4.
 // PKT_CLAIM payload: a tile of the target region (16 bits) << 20 | dragon id (16 bits) << 4.
 // A tile, not a region id: region ids depend on each dragon's own map knowledge.
-// PKT_STATUS payload: dragon id (16 bits) << 20 | its length (12 bits) << 8.
+// PKT_STATUS payload: dragon id (16 bits) << 20 | its length (12 bits) << 8 | style flags (bits 0-1:
+// opponent is a trader, opponent is a sloppy expander), so a new dragon learns the style at once.
 inline uint64_t teamSig(char team) { return team == 'A' ? 0xB7u : 0x5Du; }
 inline uint64_t packet(PacketType type, char team, uint64_t payload) {
     return (static_cast<uint64_t>(type) << 60) | (teamSig(team) << 52) | (payload & ((1ULL << 52) - 1));

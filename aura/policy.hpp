@@ -337,6 +337,8 @@ class Policy {
         // A head-on kills both; it only pays when the enemy loses clearly more. In the opening
         // no even trades at all: early segments compound (vD lost 40-49% of its dragons head-on).
         if (opening()) return enemyLen >= myLen + p_.openingTradeMargin;
+        // Phase 6: against a trader, no even trades at any time (they win those by numbers).
+        if (w_.styleTrader) return enemyLen >= myLen + p_.tradeHeavyMargin;
         return myLen <= enemyLen + p_.tradeSlack;
     }
     bool survival() const { return w_.t.units <= p_.survivalUnits; }
@@ -792,7 +794,8 @@ class Policy {
                     c.score = 100.0 + h->gain;
                     c.why = h->threat ? "defend" : "trade";
                     c.terminal = true;
-                } else if (tradeOk(L, s.visible) && !grower_ && !queen_) {
+                } else if (tradeOk(L, s.visible) && !grower_ && !queen_ &&
+                           (!w_.styleTrader || localOk(dest, s.id))) {  // Phase 6: vs a trader, only with local numbers
                     c.dest = dest;
                     c.score = 50.0 + gain;
                     c.why = "trade";
@@ -917,6 +920,14 @@ class Policy {
         if (w_.exploreTarget >= 0 && dist[w_.exploreTarget] != INF) {
             value += p_.wExploreTarget * fp(dist[w_.exploreTarget] + k);
             why = "explore";
+        }
+        // Phase 6: against a trader, swarm dragons keep a partner about pairRing away, so the
+        // pearls a trade drops are ours to eat.
+        if (p_.wPair > 0 && !queen_ && !grower_ && feedHead_ < 0) {
+            int bestD = INF;
+            for (FriendField const& f : friends_)
+                if (f.id != w_.queenId && f.dist[dest] < bestD) bestD = f.dist[dest];
+            if (bestD <= p_.pairMaxDist) value += p_.wPair * gp(std::abs(bestD + k - p_.pairRing));
         }
         // Territory (Phase 3): pull toward the target region along the terrain path field.
         // It follows gaps and known portals, so routes to another zone go via its gateways.

@@ -196,6 +196,54 @@ struct World {
         return false;
     }
 
+    // ---- opponent style (plan Phase 6) -------------------------------------------------
+    // From vision only: an enemy head that vanished close by and left a pearl on its last tile
+    // died (a dead dragon drops a pearl on its head tile); if another head next to it vanished
+    // too, it was a head-on trade, otherwise its own mistake. Plus how often enemy heads near us
+    // move closer. The flags are sticky and shared over the radio (status packet bits 0-1).
+    struct PrevHead { int id; int cell; char team; };
+    std::vector<PrevHead> prevHeads;
+    int prevOwnHead = -1;
+    int enemyDeaths = 0, enemyHeadOn = 0, enemyOwnFault = 0;
+    int approachObs = 0, approaches = 0;
+    bool styleTrader = false, styleSloppy = false;
+
+    void observeStyle(Params const& p) {
+        auto present = [&](int id) {
+            for (Seen const& s : others)
+                if (s.id == id) return true;
+            return false;
+        };
+        for (PrevHead const& ph : prevHeads) {
+            if (ph.team == init.team || present(ph.id)) continue;
+            if (!visible(ph.cell) || !seenPearl[ph.cell] || board.cheb(ph.cell, head) > 2) continue;
+            enemyDeaths++;
+            bool partner = false;
+            for (PrevHead const& q : prevHeads)
+                if (q.id != ph.id && !present(q.id) && board.cheb(q.cell, ph.cell) <= 1) partner = true;
+            (partner ? enemyHeadOn : enemyOwnFault)++;
+        }
+        if (prevOwnHead >= 0)
+            for (Seen const& s : others) {
+                if (s.team == init.team) continue;
+                for (PrevHead const& ph : prevHeads) {
+                    if (ph.id != s.id) continue;
+                    int before = board.cheb(ph.cell, prevOwnHead), after = board.cheb(s.head, head);
+                    if (before > 5) continue;
+                    approachObs++;
+                    if (after < before) approaches++;
+                }
+            }
+        if (enemyDeaths >= p.styleMinDeaths) {
+            if (enemyHeadOn >= p.tradeHeavyShare * enemyDeaths) styleTrader = true;
+            if (enemyOwnFault >= p.sloppyShare * enemyDeaths) styleSloppy = true;
+        }
+        if (approachObs >= p.approachMinObs && approaches >= p.approachShare * approachObs) styleTrader = true;
+        prevHeads.clear();
+        for (Seen const& s : others) prevHeads.push_back({s.id, s.head, s.team});
+        prevOwnHead = head;
+    }
+
     bool visible(int c) const { return visRound[c] == t.round; }
 
     bool bodyKnown() const {
@@ -340,6 +388,7 @@ struct World {
                 if (part.id == s.id) s.visible++;
 
         if (lastEatRound < 0) lastEatRound = t.round;  // a new process counts from its first turn
+        observeStyle(p);
         noteLen(teamLens, init.id, t.length, t.round, true);
         for (Seen const& s : others)
             noteLen(s.team == init.team ? teamLens : rivalLens, s.id, s.visible, t.round, false);

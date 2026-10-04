@@ -89,6 +89,8 @@ int main() {
                 int id = static_cast<int>((payload >> 20) & 0xFFFF);
                 int len = static_cast<int>((payload >> 8) & 0xFFF);
                 if (id != init.id) World::noteLen(world.teamLens, id, len, turn.round, true);
+                if (payload & 1) world.styleTrader = true;   // Phase 6: a teammate judged the style
+                if (payload & 2) world.styleSloppy = true;
             } else if (type == PKT_PORTAL_REPORT) {
                 int pid = static_cast<int>((payload >> 20) & 0xFFFF);
                 int pearls = static_cast<int>((payload >> 16) & 0xF);
@@ -121,7 +123,8 @@ int main() {
         // Priority 0b: our length, so teammates agree on the tiebreak anchor (Phase 1).
         uint64_t status = packet(PKT_STATUS, init.team,
                                  (static_cast<uint64_t>(init.id & 0xFFFF) << 20) |
-                                 (static_cast<uint64_t>(std::min(world.t.length, 4095)) << 8));
+                                 (static_cast<uint64_t>(std::min(world.t.length, 4095)) << 8) |
+                                 (world.styleTrader ? 1u : 0u) | (world.styleSloppy ? 2u : 0u));
         // Phase 3: on odd rounds that ray carries our target region instead (as one of its
         // tiles), so teammates spread over the map rather than all chasing the same area.
         bool claimTurn = turn.round % 2 == 1 && world.targetRegion >= 0 &&
@@ -204,6 +207,16 @@ int main() {
             // Feeding keeps its own start (feedRound) and only ever feeds the anchor (Phase 1):
             // starting at lateGameRound fed whoever was nearby, 18 suicides a game on the server.
             turnParams.lateSplitUnits = 0;    // Effectively stop splitting so snakes grow huge
+        }
+
+        // --- OPPONENT STYLE (Phase 6) ---
+        if (world.styleTrader) {
+            turnParams.wExposed *= turnParams.tradeHeavyExposure;  // their reach is deadlier
+            turnParams.wPair = turnParams.wPairTradeHeavy;         // move in pairs to take the drops
+        }
+        if (world.styleSloppy) {
+            turnParams.openingEnd = std::max(turnParams.openingEnd, turnParams.sloppyOpeningEnd);
+            turnParams.wRegion *= turnParams.sloppyRegionBoost;    // out-expand them, let them crash
         }
 
         // --- DECIDE: the first step is the usual full decision (splits, trades, sprint

@@ -95,3 +95,30 @@ misjudged steps; another 1208 were crashes into bodies, mostly teammates' (~11 a
   every turn. Entering a corridor that a teammate reserved in the last `corridorMemory` rounds,
   or that a teammate's head is visibly in, costs `wCorridorBusy`, so two of ours don't meet
   inside it from opposite ends.
+
+# Changes in vE6 (Phase 6: opponent-adaptive trading)
+
+Why: Cognoscenti (0-5 against vD) lost 67% of its dragons head-on: it trades and wins on
+numbers. shark++ (0-5) lost 83% of its dragons to its own mistakes, but out-expanded us.
+
+- **Style from vision** (`World::observeStyle`):
+  - **Enemy deaths:** an enemy head that vanished within 2 tiles of us and left a pearl on its
+    last tile died (a dead dragon drops a pearl on its head tile). If another head that was
+    next to it vanished too, it was a head-on trade; otherwise it was its own mistake.
+  - **Aggression:** how often enemy heads within 5 tiles move closer to ours.
+- **Classification** (sticky for the game):
+  - **Trader:** at least `tradeHeavyShare` (50%) of `styleMinDeaths`+ observed enemy deaths
+    were head-on, or at least `approachShare` (60%) of `approachMinObs`+ moves near us closed in.
+  - **Sloppy expander:** at least `sloppyShare` (60%) of their deaths were their own mistakes.
+- **Shared** in bits 0-1 of every status packet, so a newly split dragon learns the style at once.
+- **Against a trader:**
+  - no even trades at any stage: the enemy must be `tradeHeavyMargin` longer;
+  - plain trades only with local numbers;
+  - enemy sprint reach weighs `tradeHeavyExposure` (1.5x) more;
+  - swarm dragons keep a partner about `pairRing` (3) away (`wPairTradeHeavy`), so the pearls a
+    trade drops are ours to eat.
+- **Against a sloppy expander:** the careful opening runs to `sloppyOpeningEnd` (200), and the
+  territory pull is `sloppyRegionBoost` (1.3x) stronger.
+
+Caveat: the aggression rule may also fire on opponents that simply share our area a lot. If
+the server report card shows trades collapsing against ordinary teams, raise `approachShare`.
