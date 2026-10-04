@@ -1,0 +1,105 @@
+== report card vD server (104 games): 48W 56L from 104 games (body-tracking drift 0 of 1813032)
+-- all
+   ended                                  {'team eliminated': 45, 'round limit': 59}
+   dragons_ratio_r50                      0.831
+   dragons_ratio_r100                     0.674
+   dragons_ratio_r200                     0.68
+   pearls_ratio_game                      0.555
+   pearls_r25_us                          2.0
+   pearls_r25_them                        6.0
+   splits_r25_us                          3.0
+   splits_r25_them                        4.0
+   pearls_r50_us                          9.0
+   pearls_r50_them                        21.5
+   splits_r50_us                          5.0
+   splits_r50_them                        10.0
+   pearls_r100_us                         30.0
+   pearls_r100_them                       60.5
+   splits_r100_us                         15.0
+   splits_r100_them                       27.5
+   cover_us                               0.358
+   cover_them                             0.372
+   spawn_cover_us                         0.425
+   spawn_cover_them                       0.557
+   deaths                                 {'head-to-head': 4553, 'hit wall': 2402, 'hit other body': 1208, 'hit self': 3207, 'no valid action': 9}
+   self_inflicted_share                   0.599
+   self_inflicted_with_free_neighbour     2261
+   late_feeding_suicides_per_game         18.4
+   crashes_into_own_body_per_game         10.9
+   queen_died_games                       27
+   queen_death_round                      163
+   queen_death_causes                     {'head-to-head': 13, 'hit other body ->own': 6, 'hit wall': 4, 'hit self': 4}
+   queen_max_len                          4.0
+   queen_splits                           191
+   orbit_pct_us                           4.456
+   orbit_pct_them                         7.563
+-- wins
+   ended                                  {'round limit': 25, 'team eliminated': 23}
+   dragons_ratio_r50                      1.0
+   dragons_ratio_r100                     1.147
+   dragons_ratio_r200                     1.578
+   pearls_ratio_game                      1.139
+   pearls_r25_us                          4.0
+   pearls_r25_them                        7.5
+   splits_r25_us                          3.5
+   splits_r25_them                        4.5
+   pearls_r50_us                          11.5
+   pearls_r50_them                        14.0
+   splits_r50_us                          7.5
+   splits_r50_them                        9.0
+   pearls_r100_us                         44.5
+   pearls_r100_them                       48.5
+   splits_r100_us                         18.5
+   splits_r100_them                       20.5
+   cover_us                               0.377
+   cover_them                             0.329
+   spawn_cover_us                         0.472
+   spawn_cover_them                       0.524
+   deaths                                 {'hit wall': 1352, 'head-to-head': 2518, 'hit other body': 622, 'hit self': 1636, 'no valid action': 4}
+   self_inflicted_share                   0.589
+   self_inflicted_with_free_neighbour     1110
+   late_feeding_suicides_per_game         20.1
+   crashes_into_own_body_per_game         12.1
+   queen_died_games                       7
+   queen_death_round                      197
+   queen_death_causes                     {'hit other body ->own': 3, 'head-to-head': 1, 'hit wall': 1, 'hit self': 2}
+   queen_max_len                          4.0
+   queen_splits                           112
+   orbit_pct_us                           4.593
+   orbit_pct_them                         6.318
+-- losses
+   ended                                  {'team eliminated': 22, 'round limit': 34}
+   dragons_ratio_r50                      0.536
+   dragons_ratio_r100                     0.4
+   dragons_ratio_r200                     0.117
+   pearls_ratio_game                      0.187
+   pearls_r25_us                          1.0
+   pearls_r25_them                        6.0
+   splits_r25_us                          3.0
+   splits_r25_them                        4.0
+   pearls_r50_us                          5.0
+   pearls_r50_them                        24.0
+   splits_r50_us                          4.5
+   splits_r50_them                        11.0
+   pearls_r100_us                         26.5
+   pearls_r100_them                       65.0
+   splits_r100_us                         12.0
+   splits_r100_them                       29.0
+   cover_us                               0.343
+   cover_them                             0.454
+   spawn_cover_us                         0.375
+   spawn_cover_them                       0.637
+   deaths                                 {'head-to-head': 2035, 'hit wall': 1050, 'hit self': 1571, 'hit other body': 586, 'no valid action': 5}
+   self_inflicted_share                   0.611
+   self_inflicted_with_free_neighbour     1151
+   late_feeding_suicides_per_game         16.9
+   crashes_into_own_body_per_game         9.8
+   queen_died_games                       20
+   queen_death_round                      161.5
+   queen_death_causes                     {'head-to-head': 12, 'hit other body ->own': 3, 'hit wall': 3, 'hit self': 2}
+   queen_max_len                          4.0
+   queen_splits                           79
+   orbit_pct_us                           4.342
+   orbit_pct_them                         8.542
+-- round-500 games: 59; lost while ahead on total length: 11
+-- per map: {'Around UNSW': '5-1', 'Australia': '4-9', 'Autarky': '4-8', 'Default': '1-3', 'Devil': '5-2', 'Islands': '2-2', 'Maze': '1-4', 'Portals': '3-5', 'Prisoners Dilemma': '5-3', 'Queen Of Spades': '3-3', 'Schooltime': '3-2', 'Slithery Fight': '2-0', 'Stripes': '2-5', 'Tower Defense': '2-2', 'Trauma': '1-2', 'Trophy': '1-3', 'weakhold': '4-2'}
