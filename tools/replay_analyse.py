@@ -202,6 +202,7 @@ def analyse(path, us=None, our_bot=None):
                 qd = cheb(cbody[0], body[queen[tm]][0], mp.W, mp.H)
             splits.append({"round": rnd, "team": tm, "parent": parent, "child": child,
                            "parent_is_queen": parent == queen[tm], "child_len": len(cbody),
+                           "parent_len": len(pbody),
                            "child_dist_to_queen": qd})
         elif k == "death":
             i, reason = ev[1], ev[2]

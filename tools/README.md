@@ -12,6 +12,44 @@ python tools/setup_compiler.py      # only if no C++ compiler is installed (adds
 python tools/fetch_maps.py          # ladder maps -> maps/ladder/
 ```
 
+## Running on another machine (e.g. a laptop)
+
+```bash
+git checkout Mr.Aura_vE                         # this branch (aura_vD/, aura/, tools/, maps/ladder/)
+pip install -U unswbc                           # 1.2.9 or newer
+python tools/setup_compiler.py                  # only if `unswbc` says it cannot find a C++ compiler
+# local games: our bot (aura = vE6) against the server bot (aura_vD), every ladder map, both sides
+python tools/harness.py aura aura_vD --runs 1 --budget 0.02 --out replays/local_vE6_vs_vD
+# the scorecard: paste the block between the ==== lines back for review
+python tools/check.py replays/local_vE6_vs_vD
+```
+
+- `--runs 1` over 17 ladder maps × 2 sides = 34 games. Expect 30–90 minutes, depending on the
+  laptop. `--budget 0.02` shortens each turn's search (the lean margin is scaled with it).
+  Drop `--budget` to play at the real speed (much slower).
+- For a quicker look, use a few maps: `--maps Autarky,Stripes,Prisoners_Dilemma,Trauma`.
+- Server games instead: `python tools/fetch_replays.py SUBMISSION_ID`, then
+  `python tools/check.py replays/server_SUBMISSION_ID`.
+
+### What the scorecard means
+
+- **Header:**
+  - `drift` must be `0`: the replay reader rebuilt every dragon exactly. If not, ignore the
+    numbers.
+  - `played as A / B` should be balanced.
+  - `round-500 games` and `lost while ahead on total length`: vD lost 11 of 59 that way.
+- **Table:** one row per phase's job. `us` is our bot, `them` the opponent in the same games
+  (vD in local games), `vD base` is vD on the server, then the plan's target and a status:
+  - `OK`: target met.
+  - `CHECK`: better than vD but short of the target.
+  - `BAD`: worse than vD, so that phase isn't doing its job.
+- **The rows that prove a phase works**, whatever the win rate:
+  - P1: feeding suicides far below 18.4 per game; normal splits after round 300 at 0.
+  - P2: queen splits after round 60 at 0; queen never killed by our own body.
+  - P3: map and pearl-spawn coverage up; orbiting down.
+  - P4: pearls and splits by round 100 close to the opponent's; fewer early head-on deaths.
+  - P5: self-inflicted share, wall deaths and crashes into teammates down.
+
 ## Everyday loop
 
 ```bash

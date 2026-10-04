@@ -1,0 +1,20 @@
+{
+ "pearls_r100": 30.0,
+ "splits_r100": 15.0,
+ "cover": 0.357666015625,
+ "spawn_cover": 0.4247348742899137,
+ "orbit_pct": 4.456078178694158,
+ "self_inflicted_share": 0.5990860356797609,
+ "walls_per_100_created": 18.55256043871167,
+ "own_body_crashes_per_game": 10.875,
+ "early_headon_per_game": 6.971153846153846,
+ "headon_share": 0.4001230336584937,
+ "feed_suicides_per_game": 18.60576923076923,
+ "late_normal_splits_per_game": 0.8173076923076923,
+ "queen_splits_after_r60": 148,
+ "queen_survival": 0.7403846153846154,
+ "queen_max_len": 4.0,
+ "queen_killed_by_own_body": 6,
+ "round500_games": 59,
+ "round500_lost_while_ahead_total": 11
+}

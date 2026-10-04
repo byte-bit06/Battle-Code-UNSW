@@ -1,0 +1,52 @@
+saved baseline: C:\Users\bhatt\Battle-Code-UNSW\tools\baselines\vD_server_metrics.json
+
+Scorecard for replays/server_vD
+games 104  (skipped 0)   result W48 D0 L56  = 46% wins
+played as A: 80  as B: 24   opponent(s): Candiru, ChotteLocco, Codehammer_40K, Cognoscenti, I_wanna_go_to_CHINA, Loremipsum, No_Idea, Stochastic_Parrots, Yueci_L
+replay tracking drift: 0 of 1813032 checks (OK)
+round-500 games: 59, lost while ahead on total length: 11  (vD: 11 of 59)
+
+phase metric                                       us     them  vD base  target                 status
+------------------------------------------------------------------------------------------------------
+P4    pearls eaten by round 100                 30.00    60.50    30.00  >= 0.8x them           BAD
+P4    splits by round 100                       15.00    27.50    15.00  >= 0.8x them           CHECK
+P4    head-on deaths before r100 / game          6.97     8.20     6.97  <= 0.7x vD             BAD
+P3    map covered by heads r0-149                0.36     0.37     0.36  >= 0.50                BAD
+P3    pearl-spawn tiles visited r0-149           0.42     0.56     0.42  >= 0.60                BAD
+P3    orbit moves (2x2 circling) %               4.46     7.56     4.46  <= 3                   BAD
+P2    queen alive at the end (share)             0.74     0.60     0.74  >= 0.60                OK
+P2    queen max length (median)                  4.00     4.00     4.00  >= 8                   BAD
+P2    queen splits after round 60 (total)         148       68      148  = 0                    BAD
+P2    queen killed by our own body (games)          6        2        6  = 0                    BAD
+P1    feeding suicides r300+ / game             18.61    10.09    18.61  far below vD (18.4)    BAD
+P1    normal splits r300+ / game                 0.82    12.21     0.82  = 0 (escape splits ok) BAD
+P5    self-inflicted share of our deaths         0.60     0.46     0.60  <= 0.40                BAD
+P5    wall deaths per 100 dragons made          18.55    20.15    18.55  <= 0.5x vD             BAD
+P5    crashes into a teammate / game            10.88    10.29    10.88  <= 0.5x vD             BAD
+P6    head-on share of our deaths                0.40     0.25     0.40  below vD vs traders    OK
+
+per map (W-D-L): Around UNSW 5-0-1, Australia 4-0-9, Autarky 4-0-8, Default 1-0-3, Devil 5-0-2, Islands 2-0-2, Maze 1-0-4, Portals 3-0-5, Prisoners Dilemma 5-0-3, Queen Of Spades 3-0-3, Schooltime 3-0-2, Slithery Fight 2-0-0, Stripes 2-0-5, Tower Defense 2-0-2, Trauma 1-0-2, Trophy 1-0-3, weakhold 4-0-2
+
+status: OK 2  CHECK 1  BAD 13
+Small samples swing a lot: a single CHECK/BAD on fewer than ~20 games is a hint, not a verdict.
+
+==== paste from here ====
+dir=replays/server_vD games=104 W48 D0 L56 drift=0/1813032 sides=A80/B24 r500=59 r500_lost_ahead=11
+P4 pearls_r100=30.00 them=60.50 base=30.00 BAD
+P4 splits_r100=15.00 them=27.50 base=15.00 CHECK
+P4 early_headon_per_game=6.97 them=8.20 base=6.97 BAD
+P3 cover=0.36 them=0.37 base=0.36 BAD
+P3 spawn_cover=0.42 them=0.56 base=0.42 BAD
+P3 orbit_pct=4.46 them=7.56 base=4.46 BAD
+P2 queen_survival=0.74 them=0.60 base=0.74 OK
+P2 queen_max_len=4.00 them=4.00 base=4.00 BAD
+P2 queen_splits_after_r60=148 them=68 base=148 BAD
+P2 queen_killed_by_own_body=6 them=2 base=6 BAD
+P1 feed_suicides_per_game=18.61 them=10.09 base=18.61 BAD
+P1 late_normal_splits_per_game=0.82 them=12.21 base=0.82 BAD
+P5 self_inflicted_share=0.60 them=0.46 base=0.60 BAD
+P5 walls_per_100_created=18.55 them=20.15 base=18.55 BAD
+P5 own_body_crashes_per_game=10.88 them=10.29 base=10.88 BAD
+P6 headon_share=0.40 them=0.25 base=0.40 OK
+maps Around_UNSW:5-0-1 Australia:4-0-9 Autarky:4-0-8 Default:1-0-3 Devil:5-0-2 Islands:2-0-2 Maze:1-0-4 Portals:3-0-5 Prisoners_Dilemma:5-0-3 Queen_Of_Spades:3-0-3 Schooltime:3-0-2 Slithery_Fight:2-0-0 Stripes:2-0-5 Tower_Defense:2-0-2 Trauma:1-0-2 Trophy:1-0-3 weakhold:4-0-2
+==== paste to here ====
