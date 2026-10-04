@@ -49,6 +49,37 @@ struct Regions {
     }
 };
 
+// 1-wide corridors (plan Phase 5): chains of tiles with at most two ways on (by terrain:
+// kelp and known portals), at least `minLen` long. A corridor's id is its lowest tile index,
+// which every dragon that knows the same terrain computes the same way.
+struct Corridors {
+    int builtFor = -1;
+    std::vector<int> of;   // tile -> corridor id (lowest tile index in it), -1 not in a corridor
+
+    void build(Board const& b, int minLen) {
+        of.assign(b.NC, -1);
+        std::vector<int> deg(b.NC, 0);
+        for (int c = 0; c < b.NC; c++)
+            for (int d = 0; d < 4; d++) deg[c] += b.nb[c * 4 + d] >= 0;
+        std::vector<char> done(b.NC, 0);
+        std::vector<int> comp;
+        for (int c = 0; c < b.NC; c++) {
+            if (done[c] || deg[c] > 2 || deg[c] == 0) continue;
+            comp.assign(1, c);
+            done[c] = 1;
+            for (size_t qi = 0; qi < comp.size(); qi++)
+                for (int d = 0; d < 4; d++) {
+                    int n = b.nb[comp[qi] * 4 + d];
+                    if (n >= 0 && !done[n] && deg[n] <= 2 && deg[n] > 0) done[n] = 1, comp.push_back(n);
+                }
+            if (static_cast<int>(comp.size()) < minLen) continue;
+            int id = *std::min_element(comp.begin(), comp.end());
+            for (int t : comp) of[t] = id;
+        }
+        builtFor = b.version;
+    }
+};
+
 // Path distance over terrain only (kelp blocks, known portals link), ignoring dragons:
 // dragons move, terrain does not, and a long-range plan only needs the shape of the map.
 // Multi-source: every tile in `sources` starts at 0.

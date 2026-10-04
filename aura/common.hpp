@@ -180,6 +180,15 @@ struct Params {
     double wQueenBox = 6.0;           // moving so the queen's room drops below her need
     int feedAhead = 2;                // feeders die this many tiles ahead of the queen's facing
 
+    // traps and congestion (plan Phase 5). 60% of vD's deaths were self-inflicted (opponents
+    // 36%): 2402 walls with almost never a free neighbour (walked into dead ends) and 1208
+    // crashes into bodies, mostly teammates'.
+    double wDeadEnd = 1.0;            // per tile of a dead end we would walk into (time-aware)
+    int deadEndCap = 8;               // longest dead end measured
+    double wCorridorBusy = 4.0;       // entering a 1-wide corridor a teammate holds or reserved
+    int corridorMemory = 6;           // rounds a corridor reservation counts
+    int corridorMinLen = 3;           // shorter chains (a doorway) are not corridors
+
     // opening (plan Phase 4). By round 100 vD had eaten 30 pearls to the opponent's 60 and split
     // 15 times to their 28; 40-49% of our deaths were head-on trades, many of them early.
     int openingEnd = 100;             // rounds 0..openingEnd-1 are the opening
@@ -238,7 +247,9 @@ inline Params const kParams{};
 // Radio packets (sonar values). Sonar carries no sender or team, so every packet
 // we send is tagged: bits 60-63 type, bits 52-59 a team signature, bits 0-51 payload.
 // Anything whose signature does not match is ignored (enemy rays reach us too).
-enum PacketType : uint64_t { PKT_HOT = 1, PKT_PORTAL_END = 3, PKT_PORTAL_REPORT = 4, PKT_STATUS = 5, PKT_CLAIM = 6 };
+enum PacketType : uint64_t { PKT_HOT = 1, PKT_PORTAL_END = 3, PKT_PORTAL_REPORT = 4, PKT_STATUS = 5, PKT_CLAIM = 6,
+                             PKT_CORRIDOR = 7 };
+// PKT_CORRIDOR payload: the corridor's id tile (16 bits) << 20 | dragon id (16 bits) << 4.
 // PKT_CLAIM payload: a tile of the target region (16 bits) << 20 | dragon id (16 bits) << 4.
 // A tile, not a region id: region ids depend on each dragon's own map knowledge.
 // PKT_STATUS payload: dragon id (16 bits) << 20 | its length (12 bits) << 8.

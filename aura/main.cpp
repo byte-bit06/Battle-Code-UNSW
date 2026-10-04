@@ -77,6 +77,10 @@ int main() {
                     bool changed = world.notePortal(pid, orient, world.board.X(c), world.board.Y(c));
                     if (changed) world.board.rebuild();
                 }
+            } else if (type == PKT_CORRIDOR) {
+                int corridor = static_cast<int>((payload >> 20) & 0xFFFF);
+                int id = static_cast<int>((payload >> 4) & 0xFFFF);
+                if (id != init.id) world.noteReservation(corridor, id, turn.round);
             } else if (type == PKT_CLAIM) {
                 int tile = static_cast<int>((payload >> 20) & 0xFFFF);
                 int id = static_cast<int>((payload >> 4) & 0xFFFF);
@@ -131,6 +135,16 @@ int main() {
             } else {
                 out.ping(status, dirs[broadcastCount++]);
             }
+        }
+
+        // Priority 0c: inside a 1-wide corridor, reserve it so teammates do not come in from
+        // the other end (Phase 5).
+        if (broadcastCount < 4 && world.corridors.builtFor == world.board.version && world.head >= 0 &&
+            world.corridors.of[world.head] >= 0) {
+            int corridor = world.corridors.of[world.head];
+            out.ping(packet(PKT_CORRIDOR, init.team, (static_cast<uint64_t>(corridor & 0xFFFF) << 20) |
+                                                         (static_cast<uint64_t>(init.id & 0xFFFF) << 4)),
+                     dirs[broadcastCount++]);
         }
 
         // Priority 1: Hotspots

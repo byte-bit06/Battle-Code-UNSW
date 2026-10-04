@@ -77,3 +77,21 @@ Why: by round 100 vD had eaten 30 pearls to the opponent's 60 and split 15 times
   easily, and every hard cut to splitting lost to vD in testing. Queen and tactical splits
   are unchanged.
 - The army cap stays off.
+
+# Changes in vE5 (Phase 5: traps and congestion)
+
+Why: 60% of vD's deaths on the server were self-inflicted (opponents 36%). The 2402 wall
+deaths almost never had a free neighbour, so they were dead ends walked into rather than
+misjudged steps; another 1208 were crashes into bodies, mostly teammates' (~11 a game).
+
+- **Dead-end depth** (`deadEndDepth` in `nav.hpp`): from the destination, walk on while there
+  is exactly one way forward. If that ends with no way on, the move pays `wDeadEnd` per tile of
+  depth (up to `deadEndCap`). Our own body is timed, so a tail that will have moved away is
+  not a wall. This extends the old one-step pocket check, which only saw dead ends of depth 1.
+- **Corridors** (`Corridors` in `regions.hpp`): chains of at least `corridorMinLen` tiles with
+  at most two ways on, found from the terrain and rebuilt when it changes. A corridor's id is
+  its lowest tile, so dragons with the same map knowledge agree on it.
+- **Corridor reservation** (`PKT_CORRIDOR`): a dragon inside a corridor reserves it on one ray
+  every turn. Entering a corridor that a teammate reserved in the last `corridorMemory` rounds,
+  or that a teammate's head is visibly in, costs `wCorridorBusy`, so two of ours don't meet
+  inside it from opposite ends.

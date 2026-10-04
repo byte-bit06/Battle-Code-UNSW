@@ -181,6 +181,21 @@ struct World {
         return n;
     }
 
+    // ---- corridors (plan Phase 5) ----------------------------------------------------
+    Corridors corridors;
+    struct Reservation { int corridor; int id; int round; };
+    std::vector<Reservation> reservations;  // teammates holding a corridor (one per dragon)
+    void noteReservation(int corridor, int id, int round) {
+        for (Reservation& r : reservations)
+            if (r.id == id) { r = {corridor, id, round}; return; }
+        reservations.push_back({corridor, id, round});
+    }
+    bool reservedByOther(int corridor, int memory) const {
+        for (Reservation const& r : reservations)
+            if (r.corridor == corridor && r.id != init.id && t.round - r.round <= memory) return true;
+        return false;
+    }
+
     bool visible(int c) const { return visRound[c] == t.round; }
 
     bool bodyKnown() const {

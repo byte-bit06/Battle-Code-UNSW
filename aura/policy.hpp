@@ -652,6 +652,7 @@ class Policy {
         Board const& b = w_.board;
         Regions& R = w_.regions;
         regionPull_ = 0;
+        if (w_.corridors.builtFor != b.version) w_.corridors.build(b, p_.corridorMinLen);  // Phase 5
         if (R.builtFor != b.version) {
             R.build(b, p_.regionSize);  // terrain knowledge changed: ids changed too
             w_.targetRegion = -1;
@@ -1031,6 +1032,26 @@ class Policy {
                     // Would this move shrink the queen's room below what she needs?
                     int after = queenNav_.flood(b, queenHead_, blk, queenNeed_ + 1);
                     if (after < queenNeed_ && after < queenRoomBefore_) danger += p_.wQueenBox;
+                }
+            }
+        }
+
+        if (k == 0) {
+            // Phase 5: how deep a dead end this move leads into (one way on, then none), with
+            // our own body timed. vD's 2402 wall deaths almost never had a free neighbour: they
+            // were dead ends walked into, not misjudged steps.
+            int depth = deadEndDepth(b, head, dest, blk, p_.deadEndCap);
+            if (depth > 0) danger += p_.wDeadEnd * depth;
+            // Phase 5: do not enter a 1-wide corridor a teammate is in or has reserved: two
+            // dragons meeting inside one is how most of our crashes into teammates happened.
+            Corridors const& C = w_.corridors;
+            if (C.builtFor == b.version) {
+                int cor = C.of[dest];
+                if (cor >= 0 && cor != C.of[head]) {
+                    bool busy = w_.reservedByOther(cor, p_.corridorMemory);
+                    for (World::Seen const& s : w_.others)
+                        if (!isEnemy(s) && C.of[s.head] == cor) busy = true;
+                    if (busy) danger += p_.wCorridorBusy;
                 }
             }
         }

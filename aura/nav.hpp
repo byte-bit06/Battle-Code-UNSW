@@ -52,6 +52,28 @@ struct Nav {
     }
 };
 
+// Dead-end depth (plan Phase 5): walk on from `start` (entered from `from` on move 1) while
+// there is exactly one way on. Returns how many tiles deep the dead end is if the walk ends
+// with no way on, or 0 if it reaches a fork (or goes on past `cap`). Time-aware: a tile only
+// counts as open if `blk` frees it by the move we would arrive there.
+inline int deadEndDepth(Board const& b, int from, int start, std::vector<int> const& blk, int cap) {
+    int prev = from, cur = start;
+    for (int depth = 0; depth < cap; depth++) {
+        int onward = 0, next = -1;
+        for (int d = 0; d < 4; d++) {
+            int n = b.nb[cur * 4 + d];
+            if (n < 0 || n == prev || blk[n] > depth + 2) continue;
+            onward++;
+            next = n;
+        }
+        if (onward == 0) return depth + 1;
+        if (onward >= 2) return 0;
+        prev = cur;
+        cur = next;
+    }
+    return 0;
+}
+
 // blk for a body (head first, possibly only a known prefix) of true length L,
 // on top of a base grid of other dragons.
 inline void markBody(std::vector<int>& blk, std::vector<int> const& body, int L) {
